@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   MOTION SPEC  —  06-motion-spec.md, implemented.
+   Three curves. Five durations. Nothing else.
+   ============================================================ */
+:root {
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit:  cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-move:  cubic-bezier(0.65, 0, 0.35, 1);
+
+  --t-instant: 120ms;
+  --t-quick:   240ms;
+  --t-normal:  420ms;
+  --t-slow:    680ms;
+  --t-hero:   1100ms;
+}
+
+@layer base {
+  html, body {
+    margin: 0; padding: 0;
+    background-color: #08090B;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-body text-[11px] font-semibold uppercase;
+    letter-spacing: 0.26em;
+  }
+  .hairline { @apply h-px w-full bg-border-subtle; }
+
+  /* Primary pill — solid champagne, void text */
+  .btn-primary {
+    @apply font-body text-[13px] font-semibold rounded-full bg-champagne text-void;
+    padding: 14px 28px;
+    transition: background-color var(--t-quick) var(--ease-move),
+                transform var(--t-instant) var(--ease-move);
+    will-change: transform;
+  }
+  .btn-primary:active { transform: scale(0.97); background-color: #E8D5A8; }
+
+  /* Ghost — hairline champagne */
+  .btn-ghost {
+    @apply font-body text-[13px] font-semibold rounded-full text-champagne;
+    padding: 14px 28px;
+    border: 1px solid #C9A961;
+    transition: background-color var(--t-quick) var(--ease-move),
+                transform var(--t-instant) var(--ease-move);
+  }
+  .btn-ghost:active { transform: scale(0.97); background-color: rgba(201,169,97,0.1); }
+
+  .plate {
+    background-color: #14161A;
+    border: 1px solid #23262C;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  }
+}
+
+/* ---------- ENTRANCES: blur-on-enter gives motion its weight ---------- */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.985); filter: blur(14px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); filter: blur(8px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes letterIn {
+  from { opacity: 0; filter: blur(12px); transform: translateY(10px); }
+  to   { opacity: 1; filter: blur(0); transform: none; }
+}
+@keyframes ruleDraw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+@keyframes countIn {
+  0%   { opacity: 0; transform: scale(1.4); filter: blur(10px); }
+  40%  { opacity: 1; transform: scale(1);   filter: blur(0); }
+  80%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.85); }
+}
+@keyframes shutter {
+  0%   { opacity: 0; }
+  12%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@keyframes softPulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+@keyframes sheen {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(220%); }
+}
+
+.rise      { animation: riseIn  var(--t-normal) var(--ease-enter) both; }
+.fade-up   { animation: fadeUp  var(--t-normal) var(--ease-enter) both; }
+.letter-in { animation: letterIn 520ms var(--ease-enter) both; }
+.rule-draw { animation: ruleDraw 900ms var(--ease-enter) both; transform-origin: center; }
+.breathe   { animation: breathe 2400ms var(--ease-move) infinite; }
+.count-in  { animation: countIn 1000ms var(--ease-enter) both; }
+.shutter   { animation: shutter 300ms var(--ease-exit) both; }
+.soft-pulse{ animation: softPulse 2000ms var(--ease-move) infinite; }
+.sheen     { animation: sheen 1800ms var(--ease-move) infinite; }
+
+/* Exit */
+.leaving { opacity: 0; filter: blur(20px); transform: scale(0.99);
+           transition: opacity var(--t-quick) var(--ease-exit),
+                       filter var(--t-quick) var(--ease-exit),
+                       transform var(--t-quick) var(--ease-exit); }
+
+/* The money shot — 1100ms of someone becoming someone else */
+.hero-in {
+  opacity: 0; transform: scale(1.03); filter: blur(18px);
+  transition: opacity var(--t-hero) var(--ease-enter),
+              transform var(--t-hero) var(--ease-enter),
+              filter var(--t-hero) var(--ease-enter);
+  will-change: opacity, transform, filter;
+}
+.hero-in.on { opacity: 1; transform: scale(1); filter: blur(0); }
+.hero-out {
+  opacity: 1; filter: blur(0);
+  transition: opacity var(--t-hero) var(--ease-enter),
+              filter var(--t-hero) var(--ease-enter);
+}
+.hero-out.off { opacity: 0; filter: blur(10px); }
+
+/* Horizontal-only blur reads as speed. Uniform blur reads as broken. */
+.rail-flinging { filter: url(#speed-blur); }
+
+/* Radial scrim so overlay text survives a bright camera feed */
+.scrim::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(8,9,11,0.94) 0%, rgba(8,9,11,0.80) 42%, rgba(8,9,11,0.55) 70%, rgba(8,9,11,0.42) 100%),
+    linear-gradient(to bottom, rgba(8,9,11,0.6) 0%, rgba(8,9,11,0.35) 35%, rgba(8,9,11,0.35) 65%, rgba(8,9,11,0.6) 100%);
+  backdrop-filter: blur(3px) saturate(0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .rise, .fade-up, .letter-in, .hero-in { filter: none !important; transform: none !important; }
+}
