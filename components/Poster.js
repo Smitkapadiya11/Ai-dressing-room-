@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SHOP } from "@/lib/shop";
 
 // In the voice of a house that has been doing this since 1968.
@@ -24,6 +24,36 @@ function currentLine(now) {
   const minutesSinceOpen = (hour - SHOP.opensAt) * 60 + now.getMinutes();
   const i = Math.floor(minutesSinceOpen / 30) % LINES.length;
   return { text: LINES[i], afterHours: false };
+}
+
+// Eases toward 94% over 14s and waits there. Never 100% before the image
+// is actually in hand — a bar that finishes early is the fastest way to
+// look fake.
+function ProgressLine({ active }) {
+  const [pct, setPct] = useState(0);
+  const startRef = useRef(0);
+
+  useEffect(() => {
+    if (!active) {
+      setPct(0);
+      return;
+    }
+    startRef.current = Date.now();
+    let raf;
+    const tick = () => {
+      const t = Math.min((Date.now() - startRef.current) / 14_000, 1);
+      setPct(Math.min(94, (1 - Math.pow(1 - t, 3)) * 100));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active]);
+
+  return (
+    <span className="poster-progress mt-[2.2cqw]">
+      <span className="poster-progress-fill" style={{ width: `${pct}%` }} />
+    </span>
+  );
 }
 
 export default function Poster({ mode = "idle", status }) {
@@ -65,7 +95,7 @@ export default function Poster({ mode = "idle", status }) {
         {line.text}
       </p>
 
-      {working && <span className="poster-progress mt-[2.2cqw]" />}
+      {working && <ProgressLine active={working} />}
     </div>
   );
 

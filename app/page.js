@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Poster from "@/components/Poster";
 import Welcome from "@/components/Welcome";
+import TryOn from "@/components/TryOn";
 import { SHOP } from "@/lib/shop";
 
 export default function KioskPage() {
-  const [screen, setScreen] = useState("poster"); // poster | welcome
+  const [screen, setScreen] = useState("poster"); // poster | welcome | tryon
   const idleTimer = useRef(null);
 
   const returnToPoster = useCallback(() => setScreen("poster"), []);
@@ -38,11 +39,9 @@ export default function KioskPage() {
   return (
     <div className="stage" onPointerDown={poke} onPointerMove={poke}>
       <div className="panel">
-        {screen === "poster" ? (
-          <Poster mode="idle" />
-        ) : (
-          <Welcome onBegin={() => {}} />
-        )}
+        {screen === "poster" && <Poster mode="idle" />}
+        {screen === "welcome" && <Welcome onBegin={() => setScreen("tryon")} />}
+        {screen === "tryon" && <TryOn onExit={returnToPoster} />}
       </div>
     </div>
   );
