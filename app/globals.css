@@ -147,6 +147,157 @@
   backdrop-filter: blur(3px) saturate(0.7);
 }
 
+/* ============================================================
+   THE SHELL  —  one layout for phone, laptop, and portrait totem.
+   No ResizeObserver, no breakpoints for type: every size inside
+   .panel is written in cqw (1cqw = 1% of the panel's width), so
+   one set of numbers renders identically on all three screens.
+   ============================================================ */
+.stage {
+  position: relative;
+  height: 100dvh;
+  width: 100dvw;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background-color: #08090B;
+  touch-action: manipulation;
+}
+/* Wide viewports: the panel becomes a centred column. Fill the space
+   either side with the same ambient boutique image so it reads as a
+   dim room the mirror stands in, never as black bars. */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/brand/boutique.jpg") center / cover no-repeat;
+  filter: blur(60px) brightness(0.25);
+  transform: scale(1.1); /* hide the blur's soft edge */
+  z-index: 0;
+}
+.panel {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 9 / 16;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background-color: #08090B;
+  container-type: size;
+}
+
+/* ============================================================
+   THE POSTER  —  the resting state AND the loading state. One
+   component, two modes, so the screen never has a dead moment.
+   ============================================================ */
+.poster {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Ambient boutique image breathing slowly behind everything. */
+.poster-ambient {
+  position: absolute;
+  inset: 0;
+  background: url("/brand/boutique.jpg") center / cover no-repeat;
+  opacity: 0.08;
+  filter: blur(40px);
+  animation: posterAmbient 60s var(--ease-move) infinite;
+}
+@keyframes posterAmbient {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+
+.poster-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Scale-breathe wraps the drift wrapper, so the two motions compose
+   independently instead of fighting over one transform. */
+.poster-breathe {
+  animation: posterBreathe 6000ms var(--ease-move) infinite;
+}
+@keyframes posterBreathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.012); }
+}
+
+/* IDLE ONLY — a kiosk totem showing a static bright wordmark for eight
+   hours a day will burn it into the panel. This drift is not decoration,
+   it is the fix. Do not remove it. */
+.poster-drift {
+  animation: posterDrift 40s ease-in-out infinite;
+}
+.poster-drift.poster-slow {
+  animation-duration: 90s;
+}
+@keyframes posterDrift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(6cqw, -3cqw); }
+  40%  { transform: translate(2cqw, 5cqw); }
+  60%  { transform: translate(-6cqw, 2cqw); }
+  80%  { transform: translate(-2cqw, -5cqw); }
+  100% { transform: translate(0, 0); }
+}
+
+.poster-hairline {
+  display: block;
+  height: 1px;
+  width: 22cqw;
+  background: #C9A961;
+  opacity: 0.4;
+}
+
+/* House-copy line and working-mode status cross-fade, both entering
+   the same way: a soft blur clearing as the text arrives. */
+.poster-line {
+  animation: posterLineIn 2600ms var(--ease-enter) both;
+}
+@keyframes posterLineIn {
+  from { opacity: 0; filter: blur(6px); }
+  to   { opacity: 1; filter: blur(0); }
+}
+
+.poster-progress {
+  position: relative;
+  height: 1px;
+  width: 26cqw;
+  background: rgba(201, 169, 97, 0.25);
+  overflow: hidden;
+}
+.poster-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: #C9A961;
+  animation: posterProgress 1800ms var(--ease-move) infinite;
+}
+@keyframes posterProgress {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(360%); }
+}
+
+/* ============================================================
+   WELCOME SCREEN
+   ============================================================ */
+.welcome-hairline {
+  height: 1px;
+  width: 30cqw;
+  background: #C9A961;
+  opacity: 0.5;
+  animation: ruleDraw 900ms var(--ease-enter) both;
+  transform-origin: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
