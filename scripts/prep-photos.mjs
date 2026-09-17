@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // FREE catalogue path. Rs 0 if the shop photographs its own stock.
 //
+//   npm install sharp   (one-time — not a dependency of the deployed
+//                         app itself, so it isn't in package.json)
 //   node scripts/prep-photos.mjs ./raw-photos
 //
 // Takes a folder of phone photos named <garment-id>.jpg and, for each one,

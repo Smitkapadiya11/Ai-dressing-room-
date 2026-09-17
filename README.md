@@ -98,6 +98,7 @@ Name each photo `<garment-id>.jpg` (the ids are in `lib/catalogue.js`), put
 them all in one folder, then:
 
 ```bash
+npm install sharp   # one-time — not in package.json, this script only runs locally
 node scripts/prep-photos.mjs ./raw-photos
 ```
 

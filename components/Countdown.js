@@ -48,7 +48,13 @@ export default function Countdown({ onDone }) {
   }, [n]);
 
   return (
-    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center">
+    <div
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center"
+      // A tap fast-forwards to the last beat rather than firing the
+      // shutter outright — she still gets one "hold still" before it
+      // fires, just not the full five seconds every time.
+      onClick={() => n > 1 && setN(1)}
+    >
       <Silhouette />
       {n > 0 && (
         <span key={n} className="countdown-numeral relative font-display text-[26cqw] leading-none text-bone">

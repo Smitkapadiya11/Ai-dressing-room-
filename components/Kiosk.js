@@ -90,6 +90,15 @@ export default function Kiosk() {
     };
   }, [stage]);
 
+  // Escape is the keyboard equivalent of the close control below — a
+  // laptop trackpad in front of an investor is a mouse, not a finger.
+  useEffect(() => {
+    if (stage === "poster") return;
+    const onKey = (e) => e.key === "Escape" && goToPoster();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [stage, goToPoster]);
+
   const onCameraReady = useCallback(() => setCameraReady(true), []);
 
   const onFrame = useCallback((dataUrl) => {
@@ -193,7 +202,7 @@ export default function Kiosk() {
         {stage === "drawer" && (
           <>
             {error && (
-              <p className="absolute inset-x-0 top-[2cqw] z-10 text-center font-body text-[1.3cqw] leading-none text-bone">
+              <p className="kiosk-error absolute inset-x-[6cqw] top-[2.4cqw] z-10 text-center font-body text-[1.3cqw] leading-[1.4] text-bone">
                 {error}
               </p>
             )}
@@ -213,6 +222,14 @@ export default function Kiosk() {
             onTryAnother={() => setStage("drawer")}
             onPickRecommendation={runFit}
           />
+        )}
+
+        {stage !== "poster" && (
+          <button onClick={goToPoster} aria-label="Start over" className="kiosk-close absolute right-[2.4cqw] top-[2.4cqw] z-40">
+            <svg viewBox="0 0 24 24" className="h-[4.2cqw] w-[4.2cqw]" fill="none">
+              <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
         )}
       </div>
     </div>

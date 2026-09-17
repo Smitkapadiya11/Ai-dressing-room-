@@ -15,6 +15,8 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
   const [qr, setQr] = useState(null);
   const draggingRef = useRef(false);
   const heroRef = useRef(null);
+  const revealRef = useRef(null);
+  const dividerRef = useRef(null);
 
   useEffect(() => {
     setOn(false);
@@ -50,23 +52,32 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
     [garment.category, result.suggestedColours]
   );
 
-  function moveSplit(e) {
+  // The drag writes straight to the two elements' styles, not to React
+  // state — a setState per pointermove is exactly the kind of thing
+  // that makes a drag feel laggy. State only syncs on release, so the
+  // position survives toggling Compare off and back on.
+  function paintSplit(pct) {
+    if (revealRef.current) revealRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+    if (dividerRef.current) dividerRef.current.style.left = `${pct}%`;
+  }
+  function pctFromEvent(e) {
     const rect = heroRef.current.getBoundingClientRect();
-    const pct = ((e.clientX - rect.left) / rect.width) * 100;
-    setSplit(Math.max(0, Math.min(100, pct)));
+    return Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
   }
   function onPointerDown(e) {
     if (!compare) return;
     draggingRef.current = true;
     e.currentTarget.setPointerCapture(e.pointerId);
-    moveSplit(e);
+    paintSplit(pctFromEvent(e));
   }
   function onPointerMove(e) {
     if (!compare || !draggingRef.current) return;
-    moveSplit(e);
+    paintSplit(pctFromEvent(e));
   }
-  function onPointerUp() {
+  function onPointerUp(e) {
+    if (!draggingRef.current) return;
     draggingRef.current = false;
+    setSplit(pctFromEvent(e)); // persist the final position in state
   }
 
   return (
@@ -92,11 +103,11 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
         />
 
         {compare && capturedPhoto && (
-          <div className="compare-reveal" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
+          <div ref={revealRef} className="compare-reveal" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
             <img src={capturedPhoto} alt="" className="h-full w-full object-cover" />
           </div>
         )}
-        {compare && <div className="compare-divider" style={{ left: `${split}%` }} />}
+        {compare && <div ref={dividerRef} className="compare-divider" style={{ left: `${split}%` }} />}
 
         <div className="scrim absolute inset-0 pointer-events-none" />
 
