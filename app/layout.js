@@ -29,13 +29,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
       <body className="bg-void font-body text-body-lg text-on-surface antialiased select-none">
-        {/* Horizontal-only motion blur, used by the garment rail on fling.
-            Uniform blur reads as out of focus; horizontal reads as speed. */}
-        <svg width="0" height="0" className="absolute" aria-hidden="true">
-          <filter id="speed-blur" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="8 0" />
-          </filter>
-        </svg>
         {children}
       </body>
     </html>

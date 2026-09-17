@@ -51,7 +51,7 @@ function ProgressLine({ active }) {
 
   return (
     <span className="poster-progress mt-[2.2cqw]">
-      <span className="poster-progress-fill" style={{ width: `${pct}%` }} />
+      <span className="poster-progress-fill" style={{ transform: `scaleX(${pct / 100})` }} />
     </span>
   );
 }

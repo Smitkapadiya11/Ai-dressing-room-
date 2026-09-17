@@ -8,3 +8,7 @@ out
 .vercel
 dbg.mjs
 .data
+qa-screenshots
+# Real shop inventory photos, produced by scripts/prep-photos.mjs or
+# scripts/build-catalogue.mjs — regenerable, shop-specific, not code.
+public/catalogue

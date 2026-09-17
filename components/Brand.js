@@ -48,34 +48,3 @@ export function BrandMark({ strong = false, className = "" }) {
     </div>
   );
 }
-
-// The full lockup, letter by letter. Attract screen only.
-export function BrandLockup() {
-  const word = "KAPADIYA & SONS".split("");
-  return (
-    <div className="flex flex-col items-center">
-      <Monogram className="h-12 w-auto letter-in" />
-      <div className="mt-space-md flex" aria-label="Kapadiya and Sons">
-        {word.map((c, i) => (
-          <span
-            key={i}
-            className="letter-in font-body text-[12px] font-semibold uppercase text-champagne"
-            style={{ animationDelay: `${300 + i * 40}ms`, letterSpacing: "0.34em" }}
-          >
-            {c === " " ? " " : c}
-          </span>
-        ))}
-      </div>
-      <div
-        className="rule-draw mt-space-sm h-px w-[120px] bg-champagne/70"
-        style={{ animationDelay: "900ms" }}
-      />
-      <span
-        className="fade-up mt-space-sm font-body text-[10px] uppercase text-muted"
-        style={{ animationDelay: "1300ms", letterSpacing: "0.3em" }}
-      >
-        Est. Surat · Gujarat
-      </span>
-    </div>
-  );
-}
