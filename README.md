@@ -133,7 +133,7 @@ tier.
 
 ## Photographing the catalogue — Rs 0 if you do it yourself
 
-`lib/catalogue.js` lists 14 garments, one photograph each, five colourways
+`lib/catalogue.js` lists 15 garments, one photograph each, five colourways
 each. The colourway is a sentence in the try-on prompt at generation time
 ("recoloured to deep wine #6E2639"), not a second photograph — that is what
 turns 14 files into 70 combinations for nothing.

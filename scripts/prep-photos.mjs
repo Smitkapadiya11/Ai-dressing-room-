@@ -7,8 +7,8 @@
 //
 // Takes a folder of phone photos named <garment-id>.jpg and, for each one,
 // centre-crops to 3:4, resizes to 1024 on the long edge, normalises exposure,
-// and writes public/catalogue/<id>.jpg at quality 82. Prints which of the 14
-// catalogue ids are still missing — hand those to scripts/build-catalogue.mjs.
+// and writes public/catalogue/<id>.jpg at quality 82. Prints which catalogue
+// ids are still missing — hand those to scripts/build-catalogue.mjs.
 
 import { existsSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
@@ -21,10 +21,10 @@ Prep the catalogue photos — Rs 0.
 
   node scripts/prep-photos.mjs <folder-of-photos>
 
-Each photo must be named <garment-id>.jpg (see lib/catalogue.js for the 14
-ids). Anything else in the folder is ignored.
+Each photo must be named <garment-id>.jpg (see lib/catalogue.js for the ids).
+Anything else in the folder is ignored.
 
-Shooting guide — ten minutes, all fourteen garments, Rs 0:
+Shooting guide — ten minutes, all garments, Rs 0:
   - Plain light wall, garment hung flat.
   - Whole garment in frame, with a hand's width of wall on every side.
   - Daylight from a window to one side. No flash.
@@ -80,7 +80,7 @@ async function main() {
       `\nShoot those, or generate them with:\n  GEMINI_API_KEY=xxx node scripts/build-catalogue.mjs`
     );
   } else {
-    console.log("\nAll 14 garments photographed. Nothing to generate.");
+    console.log(`\nAll ${GARMENTS.length} garments photographed. Nothing to generate.`);
   }
 }
 
