@@ -155,8 +155,12 @@ node scripts/prep-photos.mjs ./raw-photos
 ```
 
 It centre-crops to 3:4, resizes to 1024 on the long edge, normalises exposure,
-and writes `public/catalogue/<id>.jpg` (gitignored — these are the shop's own
-inventory photos, not code). It prints which ids are still missing.
+and writes `public/catalogue/<id>.jpg`. **Commit these** — the try-on API
+reads garment photos straight off the server's filesystem at request time
+(`app/api/tryon/route.js`), and Vercel only deploys what's actually in git,
+so an uncommitted `public/catalogue/` means every garment fails with "No
+photo yet" in production, key or no key. It prints which ids are still
+missing.
 
 For anything still missing — a garment not yet in stock, a photo that didn't
 come out — generate it instead, using whichever `PROVIDER` is set (cheapest
