@@ -1,53 +1,32 @@
 #!/usr/bin/env node
 // PAID catalogue fallback — only for ids scripts/prep-photos.mjs reported
-// missing. Skips anything already in public/catalogue. Rs 6.41 per image,
-// so fourteen is Rs 90 and four is Rs 26. Stops on the first API error
-// instead of burning credit in a loop.
+// missing. Skips anything already in public/catalogue. Uses whichever
+// provider is set in .env.local (PROVIDER=openai|gemini) — the cheapest
+// is OpenAI's gpt-image-1-mini at about Rs 1.60. Stops on the first API
+// error instead of burning credit in a loop.
 //
-//   GEMINI_API_KEY=xxx node scripts/build-catalogue.mjs
+//   PROVIDER=openai OPENAI_API_KEY=xxx node scripts/build-catalogue.mjs
+//   PROVIDER=gemini GEMINI_API_KEY=xxx node scripts/build-catalogue.mjs
 
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { GARMENTS } from "../lib/catalogue.js";
+import { PROVIDER, TIER, generateFromText } from "../lib/imagegen.js";
 
-const API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
-const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
-const RS_PER_IMAGE = 6.41;
-
-const key = process.env.GEMINI_API_KEY;
+const key = PROVIDER === "gemini" ? process.env.GEMINI_API_KEY : process.env.OPENAI_API_KEY;
 if (!key) {
-  console.error("Set GEMINI_API_KEY. Get one at https://aistudio.google.com/apikey");
+  console.error(
+    PROVIDER === "gemini"
+      ? "Set GEMINI_API_KEY. Get one at https://aistudio.google.com/apikey"
+      : "Set OPENAI_API_KEY. Get one at https://platform.openai.com/api-keys"
+  );
   process.exit(1);
 }
 
 function buildPrompt(g) {
   const colourway = g.colourways[0].name;
   return `A single ${g.name} — ${g.fabric}, in ${colourway}. Studio product photograph, the complete garment displayed flat and centred against a plain mid-grey seamless background. Even soft lighting, no harsh shadows. The whole garment visible from neckline to hem with a small margin of background on every side. No person, no face, no mannequin head, no props, no text, no watermark. Sharp detail on the weave and the embroidery. Vertical 3:4 frame.`;
-}
-
-async function generate(g) {
-  const res = await fetch(`${API_ROOT}/${IMAGE_MODEL}:generateContent`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: buildPrompt(g) }] }],
-      generationConfig: {
-        responseModalities: ["IMAGE"],
-        imageConfig: { aspectRatio: "3:4", imageSize: "1K" },
-      },
-    }),
-  });
-
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`Gemini ${res.status} on ${g.id}: ${text.slice(0, 400)}`);
-  }
-
-  const data = JSON.parse(text);
-  const part = data?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
-  if (!part) throw new Error(`No image returned for ${g.id}`);
-  return Buffer.from(part.inlineData.data, "base64");
 }
 
 async function main() {
@@ -61,13 +40,14 @@ async function main() {
     return;
   }
 
-  console.log(`Generating ${missing.length} image(s) at ~Rs ${RS_PER_IMAGE.toFixed(2)} each.\n`);
+  console.log(`Provider: ${PROVIDER} (${TIER} tier). Generating ${missing.length} image(s).\n`);
 
   let total = 0;
   for (const g of missing) {
-    const jpg = await generate(g); // throws and stops the run on the first error
-    await writeFile(path.join(outDir, `${g.id}.jpg`), jpg);
-    total += RS_PER_IMAGE;
+    // Throws and stops the run on the first error — no burning credit in a loop.
+    const { jpeg, costInr } = await generateFromText({ prompt: buildPrompt(g) });
+    await writeFile(path.join(outDir, `${g.id}.jpg`), jpeg);
+    total += costInr;
     console.log(`✓ ${g.id}  —  running total ₹${total.toFixed(2)}`);
   }
 

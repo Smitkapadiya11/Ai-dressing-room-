@@ -1,4 +1,4 @@
-import { readBody, parseBodyRead, TEXT_COST_INR } from "@/lib/gemini";
+import { readBody, parseBodyRead, TEXT_COST_INR } from "@/lib/engine";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;

@@ -27,55 +27,85 @@ a fresh customer must never see the last one's reading.
 |---|---|
 | `/` | The kiosk — the whole journey above |
 | `/look/[id]` | What the QR code on the result screen opens on a customer's phone. Expires in 15 minutes |
-| `/api/health` | Whether `GEMINI_API_KEY` is configured |
+| `/api/health` | Whether a key is configured for the active `PROVIDER`, plus `provider`/`tier` |
 | `/api/body-read`, `/api/tryon`, `/api/verify`, `/api/share` | The engine — see below |
 
 ---
 
-## Turning it real
+## Turning it real — provider-agnostic
 
-Two environment variables, one required:
+`lib/imagegen.js` is the one function everything calls: `generate()`. It
+dispatches to `lib/providers/openai.js` or `lib/providers/gemini.js` based on
+`PROVIDER`. Switching providers is that one env var — nothing else in the app
+knows or cares which one is live.
 
 ```bash
-GEMINI_API_KEY=your_key_from_aistudio.google.com/apikey   # required
-GEMINI_API_SHAPE=A                                          # A or B, see below
-RESULT_SIZE=1K                                               # 512px | 1K | 2K
+PROVIDER=openai            # or "gemini" — the default
+RESULT_TIER=test           # or "demo", see the cost table below
+OPENAI_API_KEY=...         # if PROVIDER=openai
+GEMINI_API_KEY=...         # if PROVIDER=gemini
 ```
 
-**There is no free tier for image generation.** Google's image models are paid
-from the first call. Run `node scripts/probe-gemini.mjs` once, with a real
-key, before you build against this — Google currently has two live request
-shapes for image generation and the wrong one fails quietly. The probe costs
-about ₹6 and tells you which one to set `GEMINI_API_SHAPE` to (`A`, the
-classic `generateContent` shape, is the default if you leave it unset).
+**There is no free tier on either provider.** Before picking one, run the
+bakeoff — Rs 12, ten minutes, and it settles the question better than any
+published benchmark:
+
+```bash
+OPENAI_API_KEY=xxx GEMINI_API_KEY=yyy \
+  node scripts/bakeoff.mjs ./photo-of-you.jpg ./public/catalogue/some-garment.jpg
+```
+
+Writes `bakeoff/openai.jpg` and `bakeoff/gemini.jpg` (gitignored). Look at
+your own face in both, then set `PROVIDER` to whichever wins.
+
+If you land on Gemini, also run `node scripts/probe-gemini.mjs` once — Google
+currently has two live request shapes for image generation and the wrong one
+fails quietly. It tells you which one to set `GEMINI_API_SHAPE` to (`A`, the
+classic `generateContent` shape, is the default if unset).
+
+**One aspect-ratio catch:** OpenAI's portrait output is 1024×1536 (2:3), not
+9:16. The result screen is already full-bleed `object-fit: cover`, so this is
+a non-issue in the UI — it just centre-crops, which usually improves the
+framing since the subject is centred. Gemini returns true 9:16 natively.
 
 ## Cost per fitting
 
 One generated look is **three API calls**, but the customer only ever waits
 for one of them — the other two run in the background, before and after she
-sees the picture (see "the two timing tricks" in `lib/gemini.js` and
+sees the picture (see "the two timing tricks" in `lib/engine.js` and
 `components/Kiosk.js`).
 
 | Call | When | Cost |
 |---|---|---|
-| Body read | In the background, the instant the shutter fires | ₹0.10 |
-| Generate | While she chooses a garment, this is what she waits for | ₹4.30 (512px) / **₹6.41 (1K, ship on this)** / ₹9.66 (2K) |
-| Verify | In the background, after the result is already on screen | ₹0.10 |
+| Body read | In the background, the instant the shutter fires | ₹0.20 |
+| Generate | While she chooses a garment, this is what she waits for | see below |
+| Verify | In the background, after the result is already on screen | ₹0.20 |
 
-**≈ ₹6.61 per fitting** at the shipped default (1K). A repeat of the same
-photo through the same garment and colourway is **free** — see the cache
+Generate, by provider and tier (`RESULT_TIER`):
+
+| Provider | test | demo |
+|---|---|---|
+| OpenAI (default) | gpt-image-1-mini, ₹1.58 + ~₹0.50 input images ≈ **₹2.08** | gpt-image-2.5 → gpt-image-2 → gpt-image-1.5 fallback, ₹4.78 + ~₹0.50 ≈ **₹5.28** |
+| Gemini | 512px, **₹4.30** | 1K, **₹6.41** |
+
+All in, OpenAI at `demo` tier is about **₹5.68 a fitting** (₹700 ≈ 123
+fittings); at `test` tier about **₹2.48** (₹700 ≈ 280 test runs). Run `test`
+for every iteration while tuning the flow tonight; switch to `demo` before
+anyone important stands in front of it. A repeat of the same photo through
+the same garment, colourway, provider and tier is **free** — see the cache
 below. `.data/fittings.jsonl` (gitignored) logs every run — time, garment,
-ms, cost, whether it was a cache hit — so you can read the real per-customer
-cost back out instead of guessing.
+provider, tier, ms, cost, whether it was a cache hit — so you can read the
+real per-customer cost back out instead of guessing.
 
 ## The cache
 
-`lib/cache.js`. Before calling Gemini, the generate step hashes
-`sha256(personJpegBytes + garmentId + colourway + RESULT_SIZE)` and checks
-`.data/cache/<hash>.jpg`. A hit returns instantly, for free, with no network
-call at all — which is also your insurance against the shop wifi dying
-mid-pitch. Before a demo or a meeting, warm the cache by running the garments
-you intend to show, on a photo of yourself, once each.
+`lib/cache.js`. Before calling out, the generate step hashes
+`sha256(personJpegBytes + garmentId + colourway + PROVIDER + RESULT_TIER)`
+and checks `.data/cache/<hash>.jpg`. A hit returns instantly, for free, with
+no network call at all — which is also your insurance against the shop wifi
+dying mid-pitch. Before a demo or a meeting, warm the cache by running the
+garments you intend to show, on a photo of yourself, once each at the `demo`
+tier.
 
 ---
 
@@ -107,10 +137,11 @@ and writes `public/catalogue/<id>.jpg` (gitignored — these are the shop's own
 inventory photos, not code). It prints which ids are still missing.
 
 For anything still missing — a garment not yet in stock, a photo that didn't
-come out — generate it instead, at about ₹6.41 each:
+come out — generate it instead, using whichever `PROVIDER` is set (cheapest
+is OpenAI's gpt-image-1-mini at about ₹1.58; Gemini is about ₹4.30–6.41):
 
 ```bash
-GEMINI_API_KEY=xxx node scripts/build-catalogue.mjs
+PROVIDER=openai OPENAI_API_KEY=xxx node scripts/build-catalogue.mjs
 ```
 
 It only generates the ids `prep-photos.mjs` reported missing, skips anything

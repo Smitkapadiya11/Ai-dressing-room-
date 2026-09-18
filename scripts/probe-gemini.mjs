@@ -6,8 +6,9 @@
 //   GEMINI_API_KEY=xxx node scripts/probe-gemini.mjs
 //
 // Whichever shape wins, set GEMINI_API_SHAPE=A or GEMINI_API_SHAPE=B in
-// .env.local — lib/gemini.js's callImage() reads that one line and
-// nothing else about the app needs to change.
+// .env.local — lib/providers/gemini.js reads that one line and nothing
+// else about the app needs to change. Only relevant when PROVIDER=gemini;
+// skip this if you're running on OpenAI.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";

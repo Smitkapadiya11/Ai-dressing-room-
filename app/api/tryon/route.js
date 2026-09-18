@@ -2,7 +2,8 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { byId } from "@/lib/catalogue";
 import { cacheKey, readCache, writeCache } from "@/lib/cache";
-import { SIZE, generateTryOn, imageCostInr, inlineOf, parseBodyRead } from "@/lib/gemini";
+import { generateTryOn, inlineOf, parseBodyRead } from "@/lib/engine";
+import { PROVIDER, TIER } from "@/lib/imagegen";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -30,7 +31,7 @@ export async function POST(req) {
   const t0 = Date.now();
   const personBytes = Buffer.from(inlineOf(person).data, "base64");
   const colourwayObj = garment.colourways.find((c) => c.name === colourway) || null;
-  const key = cacheKey({ personBytes, garmentId, colourway: colourwayObj?.name || "", size: SIZE });
+  const key = cacheKey({ personBytes, garmentId, colourway: colourwayObj?.name || "", provider: PROVIDER, tier: TIER });
   const { recommendedSize, suggestedColours } = parseBodyRead(bodyRead);
 
   // THE CACHE — the same photo through the same garment tonight should
@@ -38,7 +39,7 @@ export async function POST(req) {
   const cached = readCache(key);
   if (cached) {
     const ms = Date.now() - t0;
-    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, ms, costInr: 0, cached: true });
+    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, tier: TIER, ms, costInr: 0, cached: true });
     return Response.json({
       image: `data:image/jpeg;base64,${cached.toString("base64")}`,
       bodyRead,
@@ -52,7 +53,7 @@ export async function POST(req) {
 
   try {
     const garmentImage = garmentDataUrl(garment);
-    const { image } = await generateTryOn({
+    const { image, costInr } = await generateTryOn({
       personDataUrl: person,
       garmentDataUrl: garmentImage,
       garment,
@@ -62,8 +63,7 @@ export async function POST(req) {
     writeCache(key, Buffer.from(inlineOf(image).data, "base64"));
 
     const ms = Date.now() - t0;
-    const costInr = imageCostInr();
-    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, ms, costInr, cached: false });
+    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, tier: TIER, ms, costInr, cached: false });
 
     return Response.json({ image, bodyRead, recommendedSize, suggestedColours, ms, costInr, cached: false });
   } catch (e) {
