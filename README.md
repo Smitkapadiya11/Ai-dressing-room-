@@ -85,17 +85,39 @@ Generate, by provider and tier (`RESULT_TIER`):
 
 | Provider | test | demo |
 |---|---|---|
-| OpenAI (default) | gpt-image-1-mini, ₹1.58 + ~₹0.50 input images ≈ **₹2.08** | gpt-image-2.5 → gpt-image-2 → gpt-image-1.5 fallback, ₹4.78 + ~₹0.50 ≈ **₹5.28** |
+| OpenAI (default) | gpt-image-1-mini, medium, **≈₹3.16** | gpt-image-2.5 → gpt-image-2 → gpt-image-1.5, medium, **≈₹15.68** |
 | Gemini | 512px, **₹4.30** | 1K, **₹6.41** |
 
-All in, OpenAI at `demo` tier is about **₹5.68 a fitting** (₹700 ≈ 123
-fittings); at `test` tier about **₹2.48** (₹700 ≈ 280 test runs). Run `test`
-for every iteration while tuning the flow tonight; switch to `demo` before
-anyone important stands in front of it. A repeat of the same photo through
-the same garment, colourway, provider and tier is **free** — see the cache
-below. `.data/fittings.jsonl` (gitignored) logs every run — time, garment,
+**The OpenAI figures are estimates, not confirmed against a real usage
+dashboard.** OpenAI publishes per-size/quality prices for plain text-to-image
+(1024×1536 medium ≈ ₹3.92), but this flow sends **two reference images**
+(her photo + the garment) through `images/edits`, and reference images are
+billed as extra image-input tokens on top of that. A field-measured example
+(OpenAI, Sep 2026) showed a plain low-quality call at $0.0063 vs. the same
+call with two reference images at $0.025 — roughly 4×. The table above
+applies that ratio (a smaller ~2× for the cheaper mini model, since its own
+edit-token rate isn't published anywhere). See the comment above
+`COST_INR_BY_TIER` in `lib/providers/openai.js`. **Run 5–10 real fittings
+and check your OpenAI dashboard's Usage page — that's ground truth, this is
+a bridge until then.** Note this also means OpenAI's `demo` tier is not
+obviously cheaper than Gemini once reference images are counted — the
+bakeoff should weigh cost alongside quality, not assume OpenAI wins on price.
+
+`high` quality is available (`OPENAI_IMAGE_QUALITY_DEMO=high`) but is **not**
+the `demo` default — at OpenAI's published rates it runs roughly 4× medium,
+which is too expensive for a tier default. Use it only for a final
+warm-the-cache pass on the handful of garments you're actually demoing.
+
+All in, OpenAI at `demo` tier is roughly **₹16.08 a fitting** (body read +
+generate + verify); at `test` tier roughly **₹3.56**. Run `test` for every
+iteration while tuning the flow; switch to `demo` — or warm the cache at
+`high` for just the pieces you're showing — before anyone important stands
+in front of it. A repeat of the same photo through the same garment,
+colourway, provider and tier is **free** — see the cache below.
+`.data/fittings.jsonl` (gitignored) logs every run — time, garment,
 provider, tier, ms, cost, whether it was a cache hit — so you can read the
-real per-customer cost back out instead of guessing.
+real per-customer cost back out instead of guessing, and correct the
+estimates above once you have real numbers.
 
 ## The cache
 
