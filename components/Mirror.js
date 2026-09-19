@@ -8,7 +8,7 @@ import { inr } from "@/lib/garments";
 /* ============================================================
    TIMINGS — every number here comes from 06-motion-spec.md
    ============================================================ */
-const COUNTDOWN_FROM = 3;
+const COUNTDOWN_FROM = 5;
 const IDLE_RETURN_MS = 45_000;
 const EXPECTED_MS = 12_000;   // progress arc eases toward this, never past 94%
 const SHUTTER_MS = 300;
@@ -42,7 +42,7 @@ function Silhouette() {
             "radial-gradient(ellipse 58% 52% at 50% 46%, rgba(8,9,11,0.80) 0%, rgba(8,9,11,0.55) 40%, rgba(8,9,11,0.18) 68%, rgba(8,9,11,0) 82%)",
         }}
       />
-      <svg viewBox="0 0 200 440" className="breathe relative h-[44vh] w-auto opacity-90" style={{ filter: "drop-shadow(0 0 14px rgba(8,9,11,0.9))" }} fill="none">
+      <svg viewBox="0 0 200 440" className="breathe relative h-[min(44vh,44vw)] w-auto opacity-90" style={{ filter: "drop-shadow(0 0 14px rgba(8,9,11,0.9))" }} fill="none">
         <ellipse cx="100" cy="48" rx="30" ry="36" stroke="#C9A961" strokeWidth="1.6" strokeDasharray="5 8" />
         <path
           d="M70 96 Q100 84 130 96 L146 150 Q150 200 142 260 L150 400 L118 400 L104 280 L96 280 L82 400 L50 400 L58 260 Q50 200 54 150 Z"
@@ -50,7 +50,7 @@ function Silhouette() {
         />
       </svg>
       <span className="eyebrow relative mt-space-lg rounded-full bg-void/70 px-4 py-2 text-champagne backdrop-blur-md">
-        Stand here
+        Stand anywhere · any angle works
       </span>
     </div>
   );
@@ -74,7 +74,7 @@ function ProgressArc({ startedAt }) {
   const R = 58;
   const C = 2 * Math.PI * R;
   return (
-    <svg viewBox="0 0 140 140" className="h-[140px] w-[140px] -rotate-90">
+    <svg viewBox="0 0 140 140" className="h-[clamp(108px,16vw,168px)] w-[clamp(108px,16vw,168px)] -rotate-90">
       <circle cx="70" cy="70" r={R} stroke="rgba(245,243,239,0.16)" strokeWidth="2" fill="none" />
       <circle
         cx="70" cy="70" r={R} stroke="#C9A961" strokeWidth="2" fill="none" strokeLinecap="round"
@@ -135,8 +135,17 @@ export default function Mirror({ garments, shop }) {
   const startCamera = useCallback(async () => {
     if (streamRef.current) return true;
     try {
+      // A phone selfie cam and a laptop/monitor webcam hand back very
+      // different native aspect ratios. Ask for whichever orientation
+      // actually matches the screen so object-cover doesn't over-crop.
+      const portrait =
+        typeof window !== "undefined" && window.innerHeight >= window.innerWidth;
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 1080 }, height: { ideal: 1920 } },
+        video: {
+          facingMode: "user",
+          width: { ideal: portrait ? 1080 : 1920 },
+          height: { ideal: portrait ? 1920 : 1080 },
+        },
         audio: false,
       });
       streamRef.current = stream;
@@ -296,6 +305,12 @@ export default function Mirror({ garments, shop }) {
           <div className="relative pt-space-md"><BrandLockup /></div>
 
           <div className="relative my-auto flex flex-col items-center text-center">
+            <span
+              className="fade-up eyebrow mb-space-md rounded-full border border-champagne/30 bg-void/50 px-4 py-2 text-champagne backdrop-blur-md"
+              style={{ animationDelay: "1300ms" }}
+            >
+              ✦ AI-Powered Virtual Try-On
+            </span>
             <h1
               className="fade-up font-display text-display-lg text-bone"
               style={{ animationDelay: "1500ms" }}
@@ -306,12 +321,13 @@ export default function Mirror({ garments, shop }) {
               className="fade-up mt-space-sm font-body text-title-md font-light text-muted"
               style={{ animationDelay: "1700ms" }}
             >
-              Step closer to begin.
+              Tap anywhere to begin.
             </p>
           </div>
 
-          <div className="relative flex flex-col items-center pb-space-lg">
+          <div className="relative flex flex-col items-center gap-space-sm pb-space-lg">
             <span className="soft-pulse h-[1px] w-[60px] bg-champagne" />
+            <span className="eyebrow text-bone/40">Works on any screen · any angle</span>
           </div>
         </button>
       )}
@@ -396,11 +412,14 @@ export default function Mirror({ garments, shop }) {
                 <button
                   key={g.id}
                   onClick={() => pick(g)}
-                  className="rise w-[164px] shrink-0 text-left"
+                  className="group rise w-[164px] shrink-0 text-left transition-transform duration-200 hover:-translate-y-1"
                   style={{ animationDelay: `${i * 45}ms`, scrollSnapAlign: "start" }}
                 >
-                  <div className="overflow-hidden rounded-media border border-border-subtle bg-surface">
-                    <img src={g.image} alt={g.name} className="aspect-[3/4] w-full object-cover" />
+                  <div className="overflow-hidden rounded-media border border-border-subtle bg-surface transition-colors duration-200 group-hover:border-champagne/60">
+                    <img
+                      src={g.image} alt={g.name}
+                      className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
                   <p className="mt-space-sm font-body text-body-sm text-bone">{g.name}</p>
                   <p className="eyebrow mt-1 text-muted">{inr(g.price)}</p>
@@ -472,12 +491,12 @@ export default function Mirror({ garments, shop }) {
         <div className="scrim absolute inset-0 z-40 flex flex-col items-center justify-center">
           <span
             key={count}
-            className="count-in relative font-display text-[180px] leading-none text-bone"
+            className="count-in relative font-display text-[clamp(88px,20vw,220px)] leading-none text-bone"
           >
             {count > 0 ? count : ""}
           </span>
           <p className="relative mt-space-lg font-body text-title-md text-muted">
-            Stand still, look ahead
+            Hold still — any angle works
           </p>
           <div className="relative mt-space-xl flex items-center gap-space-sm">
             <img

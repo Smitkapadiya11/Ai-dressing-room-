@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { hasKey, mode } from "@/lib/gemini";
+import { hasKey, mode, provider, imageModel, textModel } from "@/lib/ai";
 
 export const dynamic = "force-dynamic";
 
@@ -8,8 +8,9 @@ export async function GET() {
     ok: true,
     keyConfigured: hasKey(),
     mode: hasKey() ? mode() : "demo",
-    imageModel: process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image",
-    textModel: process.env.GEMINI_TEXT_MODEL || "gemini-3-flash",
+    provider: hasKey() ? provider() : null,
+    imageModel: imageModel(),
+    textModel: textModel(),
     time: new Date().toISOString(),
   });
 }
