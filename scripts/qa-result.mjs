@@ -33,7 +33,9 @@ const OLD_SCRIM = `
 
 async function run({ label, oldScrim, width, height }) {
   const browser = await chromium.launch({
-    executablePath: "/opt/pw-browsers/chromium",
+    // Was hardcoded to the Linux sandbox path, which made this harness
+    // unrunnable anywhere else. Falls back to Playwright's own download.
+    ...(process.env.QA_CHROMIUM ? { executablePath: process.env.QA_CHROMIUM } : {}),
     args: [
       "--use-fake-ui-for-media-stream",
       "--use-fake-device-for-media-stream",
@@ -97,6 +99,26 @@ async function run({ label, oldScrim, width, height }) {
   await page.screenshot({ path: `${OUT}/${label}.png` });
 
   // Report the computed style actually in effect on the scrim.
+  const layout = await page.evaluate(() => {
+    const de = document.documentElement;
+    const clipped = [];
+    for (const el of document.querySelectorAll("button, h1, h2, p, img")) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      if (r.right > innerWidth + 1 || r.left < -1 || r.bottom > innerHeight + 1 || r.top < -1) {
+        clipped.push(el.tagName.toLowerCase() + ":" + (el.textContent || "").trim().slice(0, 26));
+      }
+    }
+    const stage = document.querySelector(".result-scrim")?.getBoundingClientRect();
+    return {
+      horizontalScroll: de.scrollWidth > de.clientWidth,
+      stageWidth: stage ? Math.round(stage.width) : null,
+      viewportWidth: innerWidth,
+      sideBandsPx: stage ? Math.round((innerWidth - stage.width) / 2) : null,
+      clipped: clipped.slice(0, 6),
+    };
+  });
+
   const scrim = await page.evaluate(() => {
     const el = document.querySelector(".result-scrim");
     if (!el) return null;
@@ -113,12 +135,25 @@ async function run({ label, oldScrim, width, height }) {
   console.log(`\n[${label}] tryon calls: ${tryonCalls} (mocked, Rs 0)`);
   console.log(`[${label}] scrim backdrop-filter:`, scrim?.backdropFilter);
   console.log(`[${label}] hero img filter:`, hero?.filter, "| .on:", hero?.hasOn);
+  console.log(
+    `[${label}] stage ${layout.stageWidth}px of ${layout.viewportWidth}px viewport` +
+      ` | side bands ${layout.sideBandsPx}px | h-scroll ${layout.horizontalScroll}`
+  );
+  if (layout.clipped.length) console.log(`[${label}] CLIPPED:`, layout.clipped);
   if (errors.length) console.log(`[${label}] console errors:`, errors.slice(0, 5));
 
   await browser.close();
 }
 
 await run({ label: "result-BEFORE-old-scrim", oldScrim: true, width: 720, height: 1280 });
-await run({ label: "result-AFTER-fixed", oldScrim: false, width: 720, height: 1280 });
-await run({ label: "result-AFTER-laptop", oldScrim: false, width: 1440, height: 900 });
+// The four screens this actually has to open on. A kiosk that only looks
+// right at one aspect ratio is a kiosk that breaks in the room it gets
+// demoed in.
+const SCREENS = [
+  { label: "phone-390x844", width: 390, height: 844 },
+  { label: "kiosk-768x1024", width: 768, height: 1024 },
+  { label: "laptop-1440x900", width: 1440, height: 900 },
+  { label: "display-1920x1080", width: 1920, height: 1080 },
+];
+for (const s of SCREENS) await run({ ...s, oldScrim: false });
 console.log("\ndone");

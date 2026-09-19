@@ -142,7 +142,10 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
           {/* #8FCBB0, not the brand's dark green — that one disappears
               against a photograph. */}
           {verified === true && (
-            <p className="poster-line mt-[0.8cqw] font-body text-[1.2cqw] leading-none" style={{ color: "#8FCBB0" }}>
+            <p
+              className="result-text-line mt-[0.8cqw] font-body text-[1.2cqw] leading-none"
+              style={{ color: "#8FCBB0" }}
+            >
               ✓ Fit verified
             </p>
           )}
