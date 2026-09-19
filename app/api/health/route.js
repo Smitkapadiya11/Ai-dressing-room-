@@ -1,6 +1,6 @@
 import { del, list, put } from "@vercel/blob";
 import { PROVIDER, TIER } from "@/lib/imagegen";
-import { listModels as listOpenAiModels } from "@/lib/providers/openai";
+import { listModels as listOpenAiModels, probeTextModel } from "@/lib/providers/openai";
 
 export const runtime = "nodejs";
 // Reports live env state, so it must never be served from a build-time cache.
@@ -64,6 +64,16 @@ export async function GET(req) {
     }
   }
 
+  // ?probe=text costs at most one token and settles why /api/body-read 500s.
+  let textProbe;
+  if (params.get("probe") === "text" && PROVIDER === "openai" && keyConfigured) {
+    try {
+      textProbe = await probeTextModel();
+    } catch (e) {
+      textProbe = { error: String(e?.message || e).slice(0, 400) };
+    }
+  }
+
   return Response.json({
     keyConfigured,
     provider: PROVIDER,
@@ -74,6 +84,7 @@ export async function GET(req) {
     blobConfigured,
     ...(deep ? { blob: blobConfigured ? await blobSelfTest() : { ok: false, error: "BLOB_READ_WRITE_TOKEN is not set" } } : {}),
     ...(models ? { models } : {}),
+    ...(textProbe ? { textProbe } : {}),
     ...(PROVIDER === "gemini" ? { shape: (process.env.GEMINI_API_SHAPE || "A").toUpperCase() } : {}),
   });
 }
