@@ -17,8 +17,13 @@ function garmentDataUrl(garment) {
 }
 
 function logFitting(entry) {
-  mkdirSync(".data", { recursive: true });
-  appendFileSync(".data/fittings.jsonl", JSON.stringify(entry) + "\n");
+  // Local dev only — same read-only-filesystem reasoning as lib/cache.js.
+  try {
+    mkdirSync(".data", { recursive: true });
+    appendFileSync(".data/fittings.jsonl", JSON.stringify(entry) + "\n");
+  } catch {
+    // Not fatal — the fitting already succeeded, this is just the log.
+  }
 }
 
 export async function POST(req) {
