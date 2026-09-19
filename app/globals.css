@@ -118,13 +118,26 @@
 }
 .hero-out.off { opacity: 0; filter: blur(10px); }
 
-/* Radial scrim so overlay text survives a bright camera feed */
-.scrim::before {
+/* The result IS the product. Never blur it and never dim the middle —
+   the face and the garment live there, and that is the only thing anyone
+   is looking at.
+   The rule that used to live here was written for a live camera feed: a
+   94%-opaque black centre plus backdrop-filter: blur(3px). Applied to the
+   generated look (its only use) it made every paid result come back soft
+   and washed out, which reads as "the AI is bad" when the AI was fine.
+   Contrast for the overlay text now comes from the top and bottom edges
+   only, where no part of the person is. */
+.result-scrim::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(8,9,11,0.94) 0%, rgba(8,9,11,0.80) 42%, rgba(8,9,11,0.55) 70%, rgba(8,9,11,0.42) 100%),
-    linear-gradient(to bottom, rgba(8,9,11,0.6) 0%, rgba(8,9,11,0.35) 35%, rgba(8,9,11,0.35) 65%, rgba(8,9,11,0.6) 100%);
-  backdrop-filter: blur(3px) saturate(0.7);
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 9, 11, 0.75) 0%,
+    rgba(8, 9, 11, 0.30) 11%,
+    rgba(8, 9, 11, 0) 24%,
+    rgba(8, 9, 11, 0) 50%,
+    rgba(8, 9, 11, 0.45) 70%,
+    rgba(8, 9, 11, 0.93) 100%
+  );
 }
 
 /* ============================================================

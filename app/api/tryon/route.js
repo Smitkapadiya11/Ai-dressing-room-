@@ -41,7 +41,7 @@ export async function POST(req) {
 
   // THE CACHE — the same photo through the same garment tonight should
   // cost zero the second time.
-  const cached = readCache(key);
+  const cached = await readCache(key);
   if (cached) {
     const ms = Date.now() - t0;
     logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, tier: TIER, ms, costInr: 0, cached: true });
@@ -65,7 +65,7 @@ export async function POST(req) {
       bodyRead,
       colourway: colourwayObj,
     });
-    writeCache(key, Buffer.from(inlineOf(image).data, "base64"));
+    await writeCache(key, Buffer.from(inlineOf(image).data, "base64"));
 
     const ms = Date.now() - t0;
     logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, tier: TIER, ms, costInr, cached: false });

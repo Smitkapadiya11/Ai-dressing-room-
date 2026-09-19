@@ -109,7 +109,7 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
         )}
         {compare && <div ref={dividerRef} className="compare-divider" style={{ left: `${split}%` }} />}
 
-        <div className="scrim absolute inset-0 pointer-events-none" />
+        <div className="result-scrim absolute inset-0 pointer-events-none" />
 
         <div className="absolute left-[4cqw] top-[4cqw]">
           <BrandMark strong />
@@ -139,8 +139,10 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
               Your size: {result.recommendedSize}
             </p>
           )}
+          {/* #8FCBB0, not the brand's dark green — that one disappears
+              against a photograph. */}
           {verified === true && (
-            <p className="poster-line mt-[0.8cqw] font-body text-[1.2cqw] leading-none" style={{ color: "#2C6B58" }}>
+            <p className="poster-line mt-[0.8cqw] font-body text-[1.2cqw] leading-none" style={{ color: "#8FCBB0" }}>
               ✓ Fit verified
             </p>
           )}
