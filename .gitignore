@@ -10,3 +10,4 @@ dbg.mjs
 .data
 qa-screenshots
 bakeoff
+.env*
