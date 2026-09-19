@@ -33,13 +33,15 @@ npm run dev          # http://localhost:3000
 
 ## Turning it real
 
-One environment variable:
+The app talks to **either Gemini or OpenAI** — pick one by setting its key.
+
+### Gemini
 
 ```
 GEMINI_API_KEY=your_key_from_aistudio.google.com/apikey
 ```
 
-That is the only required one. Two optional:
+Optional:
 
 ```
 TRYON_MODE=premium               # or "simple"
@@ -49,11 +51,44 @@ GEMINI_IMAGE_MODEL=gemini-3.1-flash-image
 **There is no free tier for image generation.** Google's image models are paid
 from the first call. Budget roughly ₹3.70 per generated look.
 
+### OpenAI
+
+```
+OPENAI_API_KEY=your_key_from_platform.openai.com/api-keys
+```
+
+Optional:
+
+```
+TRYON_MODE=premium               # or "simple"
+OPENAI_IMAGE_MODEL=gpt-image-1
+OPENAI_IMAGE_SIZE=1024x1024
+OPENAI_IMAGE_QUALITY=medium      # low | medium | high | auto
+```
+
+Needs a funded account — top up at platform.openai.com/settings/organization/billing.
+At `medium` quality, budget roughly ₹6–7 per generated look (₹9–10 at `high`).
+`gpt-image-1` doesn't reproduce an arbitrary aspect ratio the way Gemini does —
+output is one of a fixed set of sizes (`1024x1024`, `1024x1536`, `1536x1024`),
+so a portrait kiosk shot may get letterboxed slightly differently than on Gemini.
+
+### Picking which one runs
+
+Set only the key for the provider you want — the app auto-detects it. If you
+ever set **both** keys, force one explicitly:
+
+```
+AI_PROVIDER=openai                # or "gemini"
+```
+
+Check `/api/health` any time to see which provider and models are live.
+
 ---
 
 ## The two modes
 
-`lib/gemini.js` implements both paths from the body-lock spec.
+`lib/gemini.js` and `lib/openai.js` each implement both paths from the
+body-lock spec, behind the same interface. `lib/ai.js` picks which one runs.
 
 **`simple`** — one call. Temperature 0.15, fixed seed, and a prompt that lists
 what must not change. Fast, cheap, right about 80% of the time.

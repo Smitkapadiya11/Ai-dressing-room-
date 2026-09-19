@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { tryOn, hasKey, mode, estimateCost } from "@/lib/gemini";
+import { tryOn, hasKey, mode, estimateCost, provider } from "@/lib/ai";
 import { byId } from "@/lib/garments";
 
 export const runtime = "nodejs";
@@ -46,7 +46,7 @@ export async function POST(req) {
       mode: "demo",
       totalMs: 2600,
       costInr: 0,
-      note: "Demo mode — no GEMINI_API_KEY is set, so this is a pre-rendered look.",
+      note: "Demo mode — no GEMINI_API_KEY or OPENAI_API_KEY is set, so this is a pre-rendered look.",
     });
   }
 
@@ -70,6 +70,7 @@ export async function POST(req) {
       verified: out.verified,
       garmentId,
       mode: out.mode,
+      provider: provider(),
       steps: out.steps,
       totalMs: out.totalMs,
       costInr: estimateCost(out.steps),
@@ -95,5 +96,9 @@ export async function POST(req) {
 }
 
 export async function GET() {
-  return NextResponse.json({ keyConfigured: hasKey(), mode: hasKey() ? mode() : "demo" });
+  return NextResponse.json({
+    keyConfigured: hasKey(),
+    mode: hasKey() ? mode() : "demo",
+    provider: hasKey() ? provider() : null,
+  });
 }
