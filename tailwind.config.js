@@ -27,14 +27,16 @@ module.exports = {
         body: ["Manrope", "system-ui", "-apple-system", "sans-serif"],
       },
       fontSize: {
-        "display-lg": ["64px", { lineHeight: "76px", letterSpacing: "-0.02em", fontWeight: "400" }],
-        "display-md": ["40px", { lineHeight: "52px", letterSpacing: "-0.01em", fontWeight: "400" }],
-        "headline-lg": ["28px", { lineHeight: "38px", letterSpacing: "0em", fontWeight: "500" }],
-        "headline-sm": ["24px", { lineHeight: "32px", letterSpacing: "0em", fontWeight: "500" }],
-        "title-md": ["20px", { lineHeight: "28px", letterSpacing: "0.01em", fontWeight: "500" }],
-        "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "0.01em", fontWeight: "400" }],
-        "body-sm": ["13px", { lineHeight: "18px", letterSpacing: "0.02em", fontWeight: "400" }],
-        eyebrow: ["11px", { lineHeight: "14px", letterSpacing: "0.26em", fontWeight: "600" }],
+        // clamp(min, preferred, max) — scales from a phone up through a
+        // laptop to a lobby display without a breakpoint table to maintain.
+        "display-lg": ["clamp(40px, 7vw, 92px)", { lineHeight: "1.14", letterSpacing: "-0.02em", fontWeight: "400" }],
+        "display-md": ["clamp(28px, 4.6vw, 54px)", { lineHeight: "1.24", letterSpacing: "-0.01em", fontWeight: "400" }],
+        "headline-lg": ["clamp(21px, 3vw, 34px)", { lineHeight: "1.32", letterSpacing: "0em", fontWeight: "500" }],
+        "headline-sm": ["clamp(19px, 2.6vw, 28px)", { lineHeight: "1.32", letterSpacing: "0em", fontWeight: "500" }],
+        "title-md": ["clamp(16px, 2vw, 23px)", { lineHeight: "1.35", letterSpacing: "0.01em", fontWeight: "500" }],
+        "body-lg": ["clamp(14px, 1.5vw, 18px)", { lineHeight: "1.5", letterSpacing: "0.01em", fontWeight: "400" }],
+        "body-sm": ["clamp(12px, 1.1vw, 14px)", { lineHeight: "1.4", letterSpacing: "0.02em", fontWeight: "400" }],
+        eyebrow: ["clamp(10px, 0.85vw, 12px)", { lineHeight: "1.3", letterSpacing: "0.26em", fontWeight: "600" }],
       },
       borderRadius: { DEFAULT: "0.5rem", md: "0.75rem", lg: "1rem", xl: "1.25rem", card: "20px", media: "16px" },
       spacing: {

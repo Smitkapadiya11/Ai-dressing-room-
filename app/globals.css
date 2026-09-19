@@ -46,6 +46,9 @@
     will-change: transform;
   }
   .btn-primary:active { transform: scale(0.97); background-color: #E8D5A8; }
+  @media (hover: hover) {
+    .btn-primary:hover { background-color: #E8D5A8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,169,97,0.28); }
+  }
 
   /* Ghost — hairline champagne */
   .btn-ghost {
@@ -56,6 +59,9 @@
                 transform var(--t-instant) var(--ease-move);
   }
   .btn-ghost:active { transform: scale(0.97); background-color: rgba(201,169,97,0.1); }
+  @media (hover: hover) {
+    .btn-ghost:hover { background-color: rgba(201,169,97,0.12); border-color: #E8D5A8; }
+  }
 
   .plate {
     background-color: #14161A;
