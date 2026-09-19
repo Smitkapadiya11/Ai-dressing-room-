@@ -101,12 +101,28 @@ async function run({ label, oldScrim, width, height }) {
   // Report the computed style actually in effect on the scrim.
   const layout = await page.evaluate(() => {
     const de = document.documentElement;
+    // The result screen scrolls inside its own container, not the document.
+    // Content below the fold there is reachable, not broken - so only count
+    // something as CLIPPED if scrolling cannot bring it into view.
+    const scroller = [...document.querySelectorAll("div")].find(
+      (d) => getComputedStyle(d).overflowY === "auto" && d.scrollHeight > d.clientHeight + 2
+    );
+    const reach = scroller ? scroller.scrollHeight - scroller.clientHeight : 0;
     const clipped = [];
+    const belowFold = [];
     for (const el of document.querySelectorAll("button, h1, h2, p, img")) {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
-      if (r.right > innerWidth + 1 || r.left < -1 || r.bottom > innerHeight + 1 || r.top < -1) {
-        clipped.push(el.tagName.toLowerCase() + ":" + (el.textContent || "").trim().slice(0, 26));
+      const label = el.tagName.toLowerCase() + ":" + (el.textContent || "").trim().slice(0, 26);
+      // A card hanging off the right edge of the recommendation rail is the
+      // rail scrolling sideways on purpose, not a layout fault.
+      const inSideScroller = el.closest(".rec-rail") !== null;
+      if (!inSideScroller && (r.right > innerWidth + 1 || r.left < -1))
+        clipped.push(label + " (horizontal)");
+      else if (inSideScroller && r.right > innerWidth + 1) continue;
+      else if (r.top < -1) clipped.push(label + " (above view)");
+      else if (r.bottom > innerHeight + 1) {
+        (r.bottom <= innerHeight + reach + 1 ? belowFold : clipped).push(label);
       }
     }
     const stage = document.querySelector(".result-scrim")?.getBoundingClientRect();
@@ -116,6 +132,8 @@ async function run({ label, oldScrim, width, height }) {
       viewportWidth: innerWidth,
       sideBandsPx: stage ? Math.round((innerWidth - stage.width) / 2) : null,
       clipped: clipped.slice(0, 6),
+      belowFold: belowFold.slice(0, 6),
+      scrollReachPx: reach,
     };
   });
 
@@ -139,7 +157,12 @@ async function run({ label, oldScrim, width, height }) {
     `[${label}] stage ${layout.stageWidth}px of ${layout.viewportWidth}px viewport` +
       ` | side bands ${layout.sideBandsPx}px | h-scroll ${layout.horizontalScroll}`
   );
-  if (layout.clipped.length) console.log(`[${label}] CLIPPED:`, layout.clipped);
+  if (layout.clipped.length) console.log(`[${label}] CLIPPED (unreachable):`, layout.clipped);
+  if (layout.belowFold.length)
+    console.log(
+      `[${label}] below fold, reachable by scrolling ${layout.scrollReachPx}px:`,
+      layout.belowFold
+    );
   if (errors.length) console.log(`[${label}] console errors:`, errors.slice(0, 5));
 
   await browser.close();
