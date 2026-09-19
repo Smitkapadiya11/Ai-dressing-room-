@@ -1,5 +1,6 @@
 import { del, list, put } from "@vercel/blob";
 import { PROVIDER, TIER } from "@/lib/imagegen";
+import { listModels as listOpenAiModels } from "@/lib/providers/openai";
 
 export const runtime = "nodejs";
 // Reports live env state, so it must never be served from a build-time cache.
@@ -45,7 +46,23 @@ export async function GET(req) {
     PROVIDER === "gemini" ? Boolean(process.env.GEMINI_API_KEY) : Boolean(process.env.OPENAI_API_KEY);
   const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
-  const deep = new URL(req.url).searchParams.get("deep") === "1";
+  const params = new URL(req.url).searchParams;
+  const deep = params.get("deep") === "1";
+  // ?models=1 answers "which name in the fallback chain does a real call
+  // actually land on?" using OpenAI's free, unbilled model listing — so the
+  // question costs nothing instead of one generation per guess.
+  const wantModels = params.get("models") === "1" && PROVIDER === "openai";
+
+  let models;
+  if (wantModels) {
+    try {
+      models = keyConfigured
+        ? await listOpenAiModels()
+        : { error: "OPENAI_API_KEY is not set" };
+    } catch (e) {
+      models = { error: String(e?.message || e).slice(0, 400) };
+    }
+  }
 
   return Response.json({
     keyConfigured,
@@ -56,6 +73,7 @@ export async function GET(req) {
     // again — so it is the first thing to check when either misbehaves.
     blobConfigured,
     ...(deep ? { blob: blobConfigured ? await blobSelfTest() : { ok: false, error: "BLOB_READ_WRITE_TOKEN is not set" } } : {}),
+    ...(models ? { models } : {}),
     ...(PROVIDER === "gemini" ? { shape: (process.env.GEMINI_API_SHAPE || "A").toUpperCase() } : {}),
   });
 }
