@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 export default async function LookPage({ params }) {
   const { id } = await params;
-  const image = getLook(id);
+  const image = await getLook(id);
 
   if (!image) {
     return (
