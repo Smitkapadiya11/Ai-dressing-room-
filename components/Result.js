@@ -7,18 +7,100 @@ import { BrandMark } from "./Brand";
 import { inr } from "@/lib/catalogue";
 import { recommend } from "@/lib/recommend";
 
+function Icon({ d }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="action-icon">
+      <path d={d} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// Before on the left, the look on the right. The handle chases the
+// finger through a damped lerp every frame — writes go straight to
+// style, never through React state, so the drag stays smooth on a kiosk
+// GPU. On open it sweeps in from the right edge, so the customer sees
+// what the control does before touching it. It is its own layer: the
+// action buttons are siblings above it, never inside the drag surface,
+// so a tap on "Hide" is always a tap on "Hide".
+function CompareSlider({ before }) {
+  const rootRef = useRef(null);
+  const revealRef = useRef(null);
+  const handleRef = useRef(null);
+  const target = useRef(100);
+  const current = useRef(100);
+  const dragging = useRef(false);
+
+  useEffect(() => {
+    let raf;
+    const paint = () => {
+      const c = current.current + (target.current - current.current) * (dragging.current ? 0.35 : 0.12);
+      current.current = Math.abs(target.current - c) < 0.05 ? target.current : c;
+      if (revealRef.current) revealRef.current.style.clipPath = `inset(0 ${100 - current.current}% 0 0)`;
+      if (handleRef.current) handleRef.current.style.left = `${current.current}%`;
+      raf = requestAnimationFrame(paint);
+    };
+    raf = requestAnimationFrame(paint);
+    const intro = setTimeout(() => (target.current = 50), 60);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(intro);
+    };
+  }, []);
+
+  const pctAt = (e) => {
+    const r = rootRef.current.getBoundingClientRect();
+    return Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100));
+  };
+  const release = () => (dragging.current = false);
+
+  return (
+    <div
+      ref={rootRef}
+      className="compare-root"
+      role="slider"
+      tabIndex={0}
+      aria-label="Before and after"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      onPointerDown={(e) => {
+        dragging.current = true;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        target.current = pctAt(e);
+      }}
+      onPointerMove={(e) => {
+        if (dragging.current) target.current = pctAt(e);
+      }}
+      onPointerUp={release}
+      onPointerCancel={release}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowLeft") target.current = Math.max(0, target.current - 5);
+        if (e.key === "ArrowRight") target.current = Math.min(100, target.current + 5);
+      }}
+    >
+      <div ref={revealRef} className="compare-reveal" style={{ clipPath: "inset(0 0% 0 0)" }}>
+        <img src={before} alt="Before" className="h-full w-full object-cover" draggable={false} />
+      </div>
+      <span className="compare-tag left-[4cqw]">Before</span>
+      <span className="compare-tag right-[4cqw]">After</span>
+      <div ref={handleRef} className="compare-handle" style={{ left: "100%" }}>
+        <span className="compare-knob">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 7l-5 5 5 5M15 7l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // The 1100ms the product exists for — one person becoming another. Do
 // not shorten it.
 export default function Result({ capturedPhoto, garment, colourway, result, verified, onTryAnother, onPickRecommendation }) {
   const [on, setOn] = useState(false);
   const [compare, setCompare] = useState(false);
-  const [split, setSplit] = useState(50);
   const [qrSvg, setQrSvg] = useState(null);
+  const [qrFailed, setQrFailed] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
-  const draggingRef = useRef(false);
-  const heroRef = useRef(null);
-  const revealRef = useRef(null);
-  const dividerRef = useRef(null);
 
   useEffect(() => {
     setOn(false);
@@ -34,12 +116,14 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
 
   // Fetched quietly in the background the moment the photo lands, so the
   // button is already live by the time she reaches for it. The code is
-  // built as SVG, not a raster PNG — vector, so it stays perfectly crisp
-  // at any size instead of blurring when it's blown up full-screen.
+  // built as SVG — vector, so it stays crisp full-screen. If storage is
+  // down the button turns into a direct download instead of vanishing.
   useEffect(() => {
     let cancelled = false;
     setQrSvg(null);
+    setQrFailed(false);
     setQrOpen(false);
+    setCompare(false);
     fetch("/api/share", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -56,55 +140,39 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
             })
           : null
       )
-      .then((svg) => !cancelled && svg && setQrSvg(svg))
-      .catch(() => {});
+      .then((svg) => {
+        if (cancelled) return;
+        if (svg) setQrSvg(svg);
+        else setQrFailed(true);
+      })
+      .catch(() => !cancelled && setQrFailed(true));
     return () => {
       cancelled = true;
     };
   }, [result.image]);
+
+  useEffect(() => {
+    if (!qrOpen) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        e.stopImmediatePropagation();
+        setQrOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [qrOpen]);
 
   const recommendations = useMemo(
     () => recommend({ category: garment.category, suggestedColours: result.suggestedColours || [] }),
     [garment.category, result.suggestedColours]
   );
 
-  // The drag writes straight to the two elements' styles, not to React
-  // state — a setState per pointermove is exactly the kind of thing
-  // that makes a drag feel laggy. State only syncs on release, so the
-  // position survives toggling Compare off and back on.
-  function paintSplit(pct) {
-    if (revealRef.current) revealRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
-    if (dividerRef.current) dividerRef.current.style.left = `${pct}%`;
-  }
-  function pctFromEvent(e) {
-    const rect = heroRef.current.getBoundingClientRect();
-    return Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-  }
-  function onPointerDown(e) {
-    if (!compare) return;
-    draggingRef.current = true;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    paintSplit(pctFromEvent(e));
-  }
-  function onPointerMove(e) {
-    if (!compare || !draggingRef.current) return;
-    paintSplit(pctFromEvent(e));
-  }
-  function onPointerUp(e) {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    setSplit(pctFromEvent(e)); // persist the final position in state
-  }
+  const qrState = qrSvg ? "ready" : qrFailed ? "failed" : "loading";
 
   return (
-    <div className="absolute inset-0 overflow-y-auto">
-      <div
-        ref={heroRef}
-        className="relative h-full w-full"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-      >
+    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
+      <div className="relative h-full w-full">
         {capturedPhoto && (
           <img
             src={capturedPhoto}
@@ -114,82 +182,75 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
         )}
         <img
           src={result.image}
-          alt=""
+          alt="Your try-on"
           className={`hero-in absolute inset-0 h-full w-full object-cover ${on ? "on" : ""}`}
         />
 
-        {compare && capturedPhoto && (
-          <div ref={revealRef} className="compare-reveal" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
-            <img src={capturedPhoto} alt="" className="h-full w-full object-cover" />
-          </div>
-        )}
-        {compare && <div ref={dividerRef} className="compare-divider" style={{ left: `${split}%` }} />}
+        {compare && capturedPhoto && <CompareSlider before={capturedPhoto} />}
 
-        <div className="result-scrim absolute inset-0 pointer-events-none" />
+        <div className="result-scrim pointer-events-none absolute inset-0" />
 
-        <div className="absolute left-[4cqw] top-[4cqw]">
+        <div className="pointer-events-none absolute left-[4cqw] top-[clamp(96px,20cqw,136px)]">
           <BrandMark strong />
         </div>
 
-        <div className="absolute bottom-[4cqw] left-[4cqw] max-w-[70cqw]">
-          <p className="result-text-line eyebrow text-[1.1cqw] leading-none text-champagne" style={{ animationDelay: "350ms" }}>
+        <div className="result-info">
+          <p
+            className="result-text-line text-[clamp(9px,1.6cqw,12px)] font-semibold uppercase tracking-[0.24em] text-champagne"
+            style={{ animationDelay: "350ms" }}
+          >
             {garment.fabric}
           </p>
           <p
-            className="result-text-line mt-[0.8cqw] font-display text-[5.5cqw] leading-tight text-bone"
+            className="result-text-line mt-[0.8cqw] font-display text-[clamp(26px,5.5cqw,44px)] leading-tight text-bone"
             style={{ animationDelay: "410ms" }}
           >
             {garment.name}
           </p>
           <p
-            className="result-text-line mt-[0.6cqw] font-body text-[1.4cqw] leading-none text-muted"
+            className="result-text-line mt-[0.6cqw] text-[clamp(12px,2.2cqw,16px)] leading-snug text-muted"
             style={{ animationDelay: "470ms" }}
           >
             {colourway?.name} · {inr(garment.price)}
+            {result.recommendedSize && <span className="text-champagne"> · Your size {result.recommendedSize}</span>}
           </p>
-          {result.recommendedSize && (
-            <p
-              className="result-text-line mt-[0.8cqw] font-body text-[1.4cqw] leading-none text-champagne"
-              style={{ animationDelay: "530ms" }}
-            >
-              Your size: {result.recommendedSize}
-            </p>
-          )}
           {/* #8FCBB0, not the brand's dark green — that one disappears
               against a photograph. */}
           {verified === true && (
-            <p
-              className="result-text-line mt-[0.8cqw] font-body text-[1.2cqw] leading-none"
-              style={{ color: "#8FCBB0" }}
-            >
+            <p className="result-text-line mt-[0.8cqw] text-[clamp(11px,1.9cqw,14px)] leading-none" style={{ color: "#8FCBB0" }}>
               ✓ Fit verified
             </p>
           )}
 
-          <div className="result-text-line mt-[1.6cqw] flex flex-wrap items-center gap-[1.2cqw]" style={{ animationDelay: "590ms" }}>
-            <button
-              onClick={onTryAnother}
-              className="btn-primary flex items-center justify-center text-[1.3cqw] leading-none"
-              style={{ minHeight: "11.3cqw" }}
-            >
-              Try another
+          <div className="result-text-line result-actions" style={{ animationDelay: "590ms" }}>
+            <button type="button" onClick={onTryAnother} className="action action-primary">
+              <Icon d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" />
+              <span>Try another</span>
             </button>
             {capturedPhoto && (
               <button
+                type="button"
                 onClick={() => setCompare((c) => !c)}
-                className="btn-ghost flex items-center justify-center text-[1.3cqw] leading-none"
-                style={{ minHeight: "11.3cqw" }}
+                className={`action ${compare ? "action-on" : ""}`}
+                aria-pressed={compare}
               >
-                {compare ? "Hide" : "Compare"}
+                <Icon d={compare ? "M6 6l12 12M18 6L6 18" : "M12 3v18M8 8l-4 4 4 4M16 8l4 4-4 4"} />
+                <span>{compare ? "Hide" : "Compare"}</span>
               </button>
             )}
-            {qrSvg && (
-              <button
-                onClick={() => setQrOpen(true)}
-                className="btn-ghost flex items-center justify-center text-[1.3cqw] leading-none"
-                style={{ minHeight: "11.3cqw" }}
-              >
-                Get this photo
+            {qrState === "failed" ? (
+              <a href={result.image} download={`kapadiya-${garment.id}.jpg`} className="action">
+                <Icon d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+                <span>Download</span>
+              </a>
+            ) : (
+              <button type="button" onClick={() => setQrOpen(true)} disabled={qrState === "loading"} className="action">
+                {qrState === "loading" ? (
+                  <span className="action-spinner" />
+                ) : (
+                  <Icon d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2" />
+                )}
+                <span>{qrState === "loading" ? "Preparing" : "Get photo"}</span>
               </button>
             )}
           </div>
@@ -198,10 +259,13 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
 
       {recommendations.length > 0 && (
         <div className="relative bg-void px-[4cqw] py-[4cqw]">
-          <p className="eyebrow mb-[2cqw] text-[1.2cqw] leading-none text-muted">Also made for you</p>
+          <p className="mb-[2cqw] text-[clamp(10px,1.7cqw,12px)] font-semibold uppercase tracking-[0.26em] text-muted">
+            Also made for you
+          </p>
           <div className="rec-rail">
             {recommendations.map(({ garment: g, reason }, i) => (
               <button
+                type="button"
                 key={g.id}
                 className="rec-card"
                 style={{ animationDelay: `${i * 45}ms` }}
@@ -210,8 +274,8 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
                 <div className="rec-card-photo">
                   <img src={g.image} alt={g.name} />
                 </div>
-                <p className="mt-[1cqw] font-body text-[1.3cqw] leading-tight text-bone">{g.name}</p>
-                <p className="mt-[0.3cqw] font-body text-[1cqw] leading-none text-champagne">{reason}</p>
+                <p className="mt-[1cqw] text-[clamp(12px,2.1cqw,15px)] leading-tight text-bone">{g.name}</p>
+                <p className="mt-[0.3cqw] text-[clamp(10px,1.7cqw,12px)] leading-none text-champagne">{reason}</p>
               </button>
             ))}
           </div>
@@ -219,11 +283,9 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
       )}
 
       {/* Portalled straight to <body> — the mirror's 9:16 panel applies
-          CSS containment (required for the cqw container queries above),
-          which would otherwise trap a position:fixed overlay inside it.
-          This is the one piece of the UI meant to fill the REAL screen,
-          phone or totem, not the panel — that's what makes it huge and
-          scannable from arm's length instead of the old corner thumbnail. */}
+          CSS containment (required for the cqw container queries), which
+          would otherwise trap a position:fixed overlay inside it. This is
+          the one piece of the UI meant to fill the REAL screen. */}
       {qrOpen &&
         qrSvg &&
         typeof document !== "undefined" &&

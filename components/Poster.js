@@ -71,7 +71,7 @@ export default function Poster({ mode = "idle", status }) {
       {working && status && (
         <p
           key={status}
-          className="poster-line mb-[2.2cqw] font-body text-[1.5cqw] leading-none not-italic tracking-[0.05em] text-muted"
+          className="poster-line mb-[2.2cqw] font-body text-[clamp(12px,1.9cqw,16px)] leading-none not-italic tracking-[0.05em] text-muted"
         >
           {status}
         </p>
@@ -79,10 +79,10 @@ export default function Poster({ mode = "idle", status }) {
 
       <div className="flex flex-col items-center">
         <span className="poster-hairline mb-[1.4cqw]" />
-        <p className="font-body text-[1.4cqw] leading-none font-semibold uppercase tracking-[0.42em] text-muted">
+        <p className="font-body text-[clamp(9px,1.5cqw,12px)] leading-none font-semibold uppercase tracking-[0.42em] text-muted">
           Made by
         </p>
-        <p className="mt-[0.8cqw] font-display text-[6.5cqw] leading-none font-normal uppercase tracking-[0.16em] text-champagne">
+        <p className="mt-[0.8cqw] font-display text-[clamp(30px,6.5cqw,56px)] leading-none font-normal uppercase tracking-[0.16em] text-champagne">
           Smit Kapadiya
         </p>
         <span className="poster-hairline mt-[1.4cqw]" />
@@ -90,7 +90,7 @@ export default function Poster({ mode = "idle", status }) {
 
       <p
         key={line.text}
-        className="poster-line mt-[1.6cqw] font-body text-[1.6cqw] leading-[1.4] font-light tracking-[0.06em] text-muted"
+        className="poster-line mt-[1.6cqw] font-body text-[clamp(12px,2cqw,16px)] leading-[1.4] font-light tracking-[0.06em] text-muted"
       >
         {line.text}
       </p>
@@ -102,6 +102,11 @@ export default function Poster({ mode = "idle", status }) {
   return (
     <div className="poster">
       <div className="poster-ambient" />
+      {!working && (
+        <p className="poster-tap absolute inset-x-0 bottom-[8cqw] text-center text-[clamp(10px,1.7cqw,13px)] font-semibold uppercase tracking-[0.3em] text-champagne">
+          Touch anywhere to begin
+        </p>
+      )}
       <div className={`absolute inset-0 ${!working ? `poster-drift ${line.afterHours ? "poster-slow" : ""}` : ""}`}>
         {block}
       </div>

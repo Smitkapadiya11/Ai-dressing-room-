@@ -62,7 +62,7 @@ export default function Countdown({ onDone }) {
         </span>
       )}
       {n > 0 && (
-        <p className="relative mt-[3cqw] font-body text-[1.8cqw] leading-none text-muted">{HINTS[n]}</p>
+        <p className="relative mt-[3cqw] rounded-full bg-void/60 px-[1.2em] py-[0.7em] font-body text-[clamp(13px,2.4cqw,18px)] leading-none text-bone backdrop-blur">{HINTS[n]}</p>
       )}
       {flash && <div className="countdown-flash absolute inset-0 z-20" />}
     </div>

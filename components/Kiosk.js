@@ -7,6 +7,7 @@ import Camera from "./Camera";
 import Countdown from "./Countdown";
 import Drawer from "./Drawer";
 import Result from "./Result";
+import TopNav from "./Nav";
 import { SHOP } from "@/lib/shop";
 
 // ============================================================
@@ -178,18 +179,47 @@ export default function Kiosk() {
     }
   }
 
+  const begin = () => {
+    setCameraReady(false);
+    setStage("countdown");
+  };
+
+  // Each stage names where Back and Next go. Next is shown even when it
+  // cannot be taken yet, so the customer always knows the next step.
+  const NAV = {
+    welcome: {
+      step: 0,
+      prev: { label: "Home", onClick: goToPoster },
+      next: { label: "Capture", onClick: begin },
+    },
+    countdown: {
+      step: 1,
+      prev: { label: "Welcome", onClick: () => setStage("welcome") },
+      next: { label: "Choose", hint: "Snap now", onClick: onCountdownDone, disabled: !cameraReady },
+    },
+    drawer: {
+      step: 2,
+      prev: { label: "Retake", hint: "Back", onClick: begin },
+      next: result && pick
+        ? { label: "Your look", onClick: () => setStage("result") }
+        : { label: "Your look", hint: "Pick a piece", disabled: true },
+    },
+    working: { step: 3, prev: null, next: null },
+    result: {
+      step: 3,
+      prev: { label: "Choose", onClick: () => setStage("drawer") },
+      next: { label: "New fitting", hint: "Done", onClick: goToPoster },
+    },
+  };
+  const nav = NAV[stage] || NAV.welcome;
+
   return (
     <div className="stage" onPointerDown={poke} onPointerMove={poke}>
       <div className="panel">
         {stage === "poster" && <Poster mode="idle" />}
 
         {stage === "welcome" && (
-          <Welcome
-            onBegin={() => {
-              setCameraReady(false);
-              setStage("countdown");
-            }}
-          />
+          <Welcome onBegin={begin} />
         )}
 
         {stage === "countdown" && (
@@ -202,7 +232,7 @@ export default function Kiosk() {
         {stage === "drawer" && (
           <>
             {error && (
-              <p className="kiosk-error absolute inset-x-[6cqw] top-[2.4cqw] z-10 text-center font-body text-[1.3cqw] leading-[1.4] text-bone">
+              <p className="kiosk-error absolute inset-x-[6cqw] top-[clamp(100px,21cqw,140px)] z-10 text-center font-body text-[clamp(12px,2cqw,15px)] leading-[1.4] text-bone">
                 {error}
               </p>
             )}
@@ -224,13 +254,7 @@ export default function Kiosk() {
           />
         )}
 
-        {stage !== "poster" && (
-          <button onClick={goToPoster} aria-label="Start over" className="kiosk-close absolute right-[2.4cqw] top-[2.4cqw] z-40">
-            <svg viewBox="0 0 24 24" className="h-[4.2cqw] w-[4.2cqw]" fill="none">
-              <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-          </button>
-        )}
+        {stage !== "poster" && <TopNav {...nav} onClose={goToPoster} busy={stage === "working"} />}
       </div>
     </div>
   );

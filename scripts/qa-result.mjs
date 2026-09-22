@@ -17,7 +17,7 @@ mkdirSync(OUT, { recursive: true });
 
 // A real photograph with fine fabric detail — if anything blurs it, the
 // weave turns to mush and it is obvious at a glance.
-const fake = readFileSync("public/catalogue/nehru-jacket-set.jpg").toString("base64");
+const fake = readFileSync("public/catalogue/emerald-velvet-waistcoat.jpg").toString("base64");
 const fakeResult = `data:image/jpeg;base64,${fake}`;
 
 // The exact rule that used to sit over the result, so the "before" shot
