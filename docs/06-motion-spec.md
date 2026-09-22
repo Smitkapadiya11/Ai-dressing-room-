@@ -110,8 +110,19 @@ The captured still is already on screen. The generated image loads underneath
 at opacity 0, `scale(1.03)`, `blur(18px)`. Then over `--t-hero` (1100ms) with
 `--ease-enter`: result goes to opacity 1, scale 1, blur 0, while the original
 goes to opacity 0 and `blur(10px)`. One thousand one hundred milliseconds of
-someone becoming someone else. Do not rush this. The price tag, name and QR
-enter 350ms after the cross-fade begins, staggered 60ms apart.
+someone becoming someone else. Do not rush this. The price tag, name and the
+row of action buttons — Try another, Compare, Get this photo — enter 350ms
+after the cross-fade begins, staggered 60ms apart.
+
+**Get this photo → full-screen QR**
+No corner thumbnail. The result screen carries one pill button, same row as
+Try another and Compare, that appears only once the share link is ready
+(usually already true by the time anyone reaches for it). Tapping it portals
+a full-viewport overlay straight to `<body>` — not into `.panel` — so it
+fills the customer's actual screen, phone or totem, at up to 720px, in pure
+black-on-white with `errorCorrectionLevel: "H"`. Rendered as SVG, not a
+raster PNG, so it never blurs no matter how large it's shown. Dismiss with
+the close button or a tap anywhere on the overlay.
 
 **Compare slider**
 Drag handle follows the finger with zero lag — position on `pointermove`, no

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import QRCode from "qrcode";
 import { BrandMark } from "./Brand";
 import { inr } from "@/lib/catalogue";
@@ -12,7 +13,8 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
   const [on, setOn] = useState(false);
   const [compare, setCompare] = useState(false);
   const [split, setSplit] = useState(50);
-  const [qr, setQr] = useState(null);
+  const [qrSvg, setQrSvg] = useState(null);
+  const [qrOpen, setQrOpen] = useState(false);
   const draggingRef = useRef(false);
   const heroRef = useRef(null);
   const revealRef = useRef(null);
@@ -30,17 +32,31 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
     };
   }, [result.image]);
 
+  // Fetched quietly in the background the moment the photo lands, so the
+  // button is already live by the time she reaches for it. The code is
+  // built as SVG, not a raster PNG — vector, so it stays perfectly crisp
+  // at any size instead of blurring when it's blown up full-screen.
   useEffect(() => {
     let cancelled = false;
-    setQr(null);
+    setQrSvg(null);
+    setQrOpen(false);
     fetch("/api/share", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: result.image }),
     })
       .then((r) => r.json())
-      .then((d) => d.url && QRCode.toDataURL(d.url, { margin: 1, width: 240, color: { dark: "#08090B", light: "#F5F3EF" } }))
-      .then((png) => !cancelled && png && setQr(png))
+      .then((d) =>
+        d.url
+          ? QRCode.toString(d.url, {
+              type: "svg",
+              errorCorrectionLevel: "H",
+              margin: 2,
+              color: { dark: "#08090B", light: "#FFFFFF" },
+            })
+          : null
+      )
+      .then((svg) => !cancelled && svg && setQrSvg(svg))
       .catch(() => {});
     return () => {
       cancelled = true;
@@ -115,7 +131,7 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
           <BrandMark strong />
         </div>
 
-        <div className="absolute bottom-[4cqw] left-[4cqw] max-w-[56cqw]">
+        <div className="absolute bottom-[4cqw] left-[4cqw] max-w-[70cqw]">
           <p className="result-text-line eyebrow text-[1.1cqw] leading-none text-champagne" style={{ animationDelay: "350ms" }}>
             {garment.fabric}
           </p>
@@ -150,7 +166,7 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
             </p>
           )}
 
-          <div className="result-text-line mt-[1.6cqw] flex items-center gap-[1.2cqw]" style={{ animationDelay: "590ms" }}>
+          <div className="result-text-line mt-[1.6cqw] flex flex-wrap items-center gap-[1.2cqw]" style={{ animationDelay: "590ms" }}>
             <button
               onClick={onTryAnother}
               className="btn-primary flex items-center justify-center text-[1.3cqw] leading-none"
@@ -167,18 +183,17 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
                 {compare ? "Hide" : "Compare"}
               </button>
             )}
+            {qrSvg && (
+              <button
+                onClick={() => setQrOpen(true)}
+                className="btn-ghost flex items-center justify-center text-[1.3cqw] leading-none"
+                style={{ minHeight: "11.3cqw" }}
+              >
+                Get this photo
+              </button>
+            )}
           </div>
         </div>
-
-        {qr && (
-          <div
-            className="result-text-line qr-card absolute bottom-[4cqw] right-[4cqw] flex w-[13cqw] flex-col items-center gap-[0.6cqw]"
-            style={{ animationDelay: "650ms" }}
-          >
-            <img src={qr} alt="Scan to keep this look" className="w-full rounded" />
-            <span className="font-body text-[0.9cqw] leading-none text-ink-soft">Scan to keep</span>
-          </div>
-        )}
       </div>
 
       {recommendations.length > 0 && (
@@ -202,6 +217,28 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
           </div>
         </div>
       )}
+
+      {/* Portalled straight to <body> — the mirror's 9:16 panel applies
+          CSS containment (required for the cqw container queries above),
+          which would otherwise trap a position:fixed overlay inside it.
+          This is the one piece of the UI meant to fill the REAL screen,
+          phone or totem, not the panel — that's what makes it huge and
+          scannable from arm's length instead of the old corner thumbnail. */}
+      {qrOpen &&
+        qrSvg &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="qr-overlay" onClick={() => setQrOpen(false)}>
+            <button className="qr-overlay-close" onClick={() => setQrOpen(false)} aria-label="Close">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </button>
+            <div className="qr-overlay-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+            <p className="qr-overlay-label">Point your phone's camera here to save this photo</p>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

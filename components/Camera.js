@@ -2,9 +2,11 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 
-// Capture at the video's native size, downscale only past 1536 on the long
-// edge. A 640x480 capture is the most common reason a result comes back soft.
-function grabFrame(video, maxEdge = 1536) {
+// Capture at the video's native size, downscale only past 2560 on the long
+// edge — high enough that a modern phone or webcam's true resolution comes
+// through instead of being clipped to an arbitrary low ceiling. A soft
+// capture was almost always this ceiling, not the camera.
+function grabFrame(video, maxEdge = 2560) {
   const vw = video.videoWidth || 1080;
   const vh = video.videoHeight || 1920;
   const scale = Math.min(1, maxEdge / Math.max(vw, vh));
@@ -19,10 +21,10 @@ function grabFrame(video, maxEdge = 1536) {
   ctx.translate(w, 0);
   ctx.scale(-1, 1);
   ctx.drawImage(video, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.92);
+  return canvas.toDataURL("image/jpeg", 0.95);
 }
 
-async function frameFromFile(file, maxEdge = 1536) {
+async function frameFromFile(file, maxEdge = 2560) {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const w = Math.round(bitmap.width * scale);
@@ -31,7 +33,7 @@ async function frameFromFile(file, maxEdge = 1536) {
   canvas.width = w;
   canvas.height = h;
   canvas.getContext("2d").drawImage(bitmap, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.92);
+  return canvas.toDataURL("image/jpeg", 0.95);
 }
 
 // Camera refused or missing is never a dead end and never a silent
@@ -45,14 +47,27 @@ const Camera = forwardRef(function Camera({ onReady, onFrame }, ref) {
     let cancelled = false;
     (async () => {
       try {
+        // "ideal" past 4K just tells the browser to hand over the best this
+        // camera has — it never fails for asking too high.
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user", width: { ideal: 1440 }, height: { ideal: 1920 } },
+          video: { facingMode: "user", width: { ideal: 4096 }, height: { ideal: 2160 } },
           audio: false,
         });
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
+
+        // Some devices still hand back less than they're capable of until
+        // asked directly — pin the track to its own reported ceiling.
+        const [track] = stream.getVideoTracks();
+        const caps = track.getCapabilities?.();
+        if (caps?.width?.max && caps?.height?.max) {
+          await track
+            .applyConstraints({ width: { ideal: caps.width.max }, height: { ideal: caps.height.max } })
+            .catch(() => {});
+        }
+
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;

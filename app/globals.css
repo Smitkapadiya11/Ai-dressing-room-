@@ -441,10 +441,58 @@
   animation: fadeUp var(--t-normal) var(--ease-enter) both;
 }
 
-.qr-card {
-  background: #F5F3EF;
-  border-radius: 12px;
-  padding: 1.2cqw;
+/* Full-screen QR — portalled to <body> (see components/Result.js), so
+   these are real viewport units, not cqw: it fills the customers actual
+   screen, phone or totem, not the scaled-down mirror panel. Pure black on
+   white and a generous quiet zone is the highest-reliability combination
+   a phone camera can scan, at any distance, in any light. */
+.qr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px;
+  background: #FFFFFF;
+  animation: fadeUp var(--t-quick) var(--ease-enter) both;
+}
+.qr-overlay-code {
+  width: min(88vw, 78dvh, 720px);
+  max-width: 720px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+.qr-overlay-code svg { display: block; width: 100%; height: 100%; }
+.qr-overlay-label {
+  max-width: 480px;
+  font-family: Manrope, system-ui, -apple-system, sans-serif;
+  font-size: clamp(15px, 2.2vw, 20px);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: #08090B;
+  text-align: center;
+}
+.qr-overlay-close {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  right: max(20px, env(safe-area-inset-right));
+  height: 52px;
+  width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(8, 9, 11, 0.06);
+  color: #08090B;
+  transition: transform var(--t-instant) var(--ease-move), background var(--t-instant) var(--ease-move);
+}
+.qr-overlay-close svg { height: 22px; width: 22px; }
+.qr-overlay-close:active { transform: scale(0.94); background: rgba(8, 9, 11, 0.12); }
+@media (hover: hover) {
+  .qr-overlay-close:hover { background: rgba(8, 9, 11, 0.1); }
 }
 
 /* Compare — position follows the finger with no transition during the
