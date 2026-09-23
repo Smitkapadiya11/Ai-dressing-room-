@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GARMENTS, inr } from "@/lib/catalogue";
 import { Arrow } from "./Nav";
+import ModelPicker from "./ModelPicker";
 
 function Card({ garment, index, expanded, onToggle, onPick }) {
   const [colourIdx, setColourIdx] = useState(0);
@@ -159,7 +160,7 @@ function useRail(railRef, deps) {
 
 // The body read already chose the size — no size picker. Every choice
 // removed is a choice she cannot get wrong in front of an investor.
-export default function Drawer({ capturedPhoto, onPick }) {
+export default function Drawer({ capturedPhoto, onPick, engines, engine, onEngine }) {
   const [tab, setTab] = useState("men");
   const [expandedId, setExpandedId] = useState(null);
   const railRef = useRef(null);
@@ -225,6 +226,7 @@ export default function Drawer({ capturedPhoto, onPick }) {
             <span style={{ transform: `scaleX(${Math.max(0.06, edge.progress ?? 0)})` }} />
           </span>
           <span className="rail-hint">Scroll, drag or use ← →</span>
+          <ModelPicker engines={engines} value={engine} onChange={onEngine} />
         </div>
       </div>
     </div>

@@ -978,3 +978,34 @@
   .attract-ring, .attract-ring::after, .countdown-ring { animation: none; }
   .hero-in { clip-path: none; transition: opacity 200ms; }
 }
+
+/* ---------- Engine picker (garment drawer) ---------- */
+.model-chip {
+  display: inline-flex; align-items: center; gap: 0.6em; flex-shrink: 0;
+  min-height: 36px; padding: 0 1em; border-radius: 999px;
+  border: 1px solid rgba(201, 169, 97, 0.45);
+  font-size: clamp(10px, 1.7cqw, 12px); letter-spacing: 0.04em; white-space: nowrap;
+}
+.model-chip:hover { border-color: #C9A961; }
+.model-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: #C9A961; }
+.model-scrim { position: absolute; inset: 0; z-index: 20; background: rgba(0, 0, 0, 0.35); cursor: default; }
+.model-drawer {
+  position: absolute; left: 4cqw; right: 4cqw; bottom: 0; z-index: 21;
+  display: grid; gap: 6px; padding: 14px 14px 18px;
+  border: 1px solid rgba(201, 169, 97, 0.35); border-bottom: 0; border-radius: 16px 16px 0 0;
+  background: rgba(14, 12, 10, 0.97);
+  transform: translateY(105%); transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+.model-drawer.open { transform: none; pointer-events: auto; }
+.model-drawer-title {
+  font-size: clamp(9px, 1.6cqw, 12px); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.26em; color: #C9A961; margin-bottom: 4px;
+}
+.model-option {
+  display: flex; justify-content: space-between; align-items: center; gap: 1em;
+  min-height: 48px; padding: 0 14px; border-radius: 10px;
+  border: 1px solid rgba(245, 243, 239, 0.12); font-size: clamp(12px, 2cqw, 15px); text-align: left;
+}
+.model-option.on { border-color: #C9A961; background: rgba(201, 169, 97, 0.1); }
+.model-option .text-muted { font-size: 0.8em; }

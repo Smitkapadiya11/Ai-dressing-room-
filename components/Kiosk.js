@@ -41,6 +41,19 @@ export default function Kiosk() {
   const [result, setResult] = useState(null);
   const [verified, setVerified] = useState(null);
   const [error, setError] = useState(null);
+  // Operator's engine choice — deliberately survives the idle reset.
+  const [engines, setEngines] = useState([]);
+  const [engine, setEngine] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/tryon/providers")
+      .then((r) => r.json())
+      .then((d) => {
+        setEngines(d.engines || []);
+        setEngine((cur) => cur || d.defaultEngine);
+      })
+      .catch(() => {});
+  }, []);
 
   const capturedRef = useRef(null);
   // TRICK ONE lives here: holds the body-read response once it resolves,
@@ -152,6 +165,7 @@ export default function Kiosk() {
           garmentId: garment.id,
           colourway: colourway?.name,
           bodyRead,
+          engine,
         }),
       });
       const data = await res.json();
@@ -236,7 +250,7 @@ export default function Kiosk() {
                 {error}
               </p>
             )}
-            <Drawer capturedPhoto={capturedRef.current} onPick={runFit} />
+            <Drawer capturedPhoto={capturedRef.current} onPick={runFit} engines={engines} engine={engine} onEngine={setEngine} />
           </>
         )}
 

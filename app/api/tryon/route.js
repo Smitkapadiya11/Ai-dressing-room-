@@ -3,7 +3,7 @@ import path from "node:path";
 import { byId } from "@/lib/catalogue";
 import { cacheKey, readCache, writeCache } from "@/lib/cache";
 import { generateTryOn, inlineOf, parseBodyRead } from "@/lib/engine";
-import { PROVIDER, TIER } from "@/lib/imagegen";
+import { PROVIDER, TIER, resolveEngine } from "@/lib/imagegen";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -27,16 +27,18 @@ function logFitting(entry) {
 }
 
 export async function POST(req) {
-  const { person, garmentId, colourway, bodyRead } = await req.json();
+  const { person, garmentId, colourway, bodyRead, engine: askedEngine } = await req.json();
   const garment = byId(garmentId);
   if (!person || !garment) {
     return Response.json({ error: "Missing photo or garment" }, { status: 400 });
   }
 
+  // The client only asks; the server decides what is actually configured.
+  const engine = resolveEngine(askedEngine);
   const t0 = Date.now();
   const personBytes = Buffer.from(inlineOf(person).data, "base64");
   const colourwayObj = garment.colourways.find((c) => c.name === colourway) || null;
-  const key = cacheKey({ personBytes, garmentId, colourway: colourwayObj?.name || "", provider: PROVIDER, tier: TIER });
+  const key = cacheKey({ personBytes, garmentId, colourway: colourwayObj?.name || "", provider: engine === "house" ? PROVIDER : engine, tier: TIER });
   const { recommendedSize, suggestedColours } = parseBodyRead(bodyRead);
 
   // THE CACHE — the same photo through the same garment tonight should
@@ -44,7 +46,7 @@ export async function POST(req) {
   const cached = await readCache(key);
   if (cached) {
     const ms = Date.now() - t0;
-    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, tier: TIER, ms, costInr: 0, cached: true });
+    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, engine, tier: TIER, ms, costInr: 0, cached: true });
     return Response.json({
       image: `data:image/jpeg;base64,${cached.toString("base64")}`,
       bodyRead,
@@ -52,6 +54,7 @@ export async function POST(req) {
       suggestedColours,
       ms,
       costInr: 0,
+      engine,
       cached: true,
     });
   }
@@ -64,13 +67,14 @@ export async function POST(req) {
       garment,
       bodyRead,
       colourway: colourwayObj,
+      engine,
     });
     await writeCache(key, Buffer.from(inlineOf(image).data, "base64"));
 
     const ms = Date.now() - t0;
-    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, tier: TIER, ms, costInr, cached: false });
+    logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, engine, tier: TIER, ms, costInr, cached: false });
 
-    return Response.json({ image, bodyRead, recommendedSize, suggestedColours, ms, costInr, cached: false });
+    return Response.json({ image, bodyRead, recommendedSize, suggestedColours, ms, costInr, engine, cached: false });
   } catch (e) {
     // Never fall back to a pre-rendered image — say plainly what happened.
     return Response.json({ error: e.message || "That look did not come through." }, { status: 500 });
