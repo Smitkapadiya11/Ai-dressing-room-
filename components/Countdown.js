@@ -56,6 +56,7 @@ export default function Countdown({ onDone }) {
       onClick={() => n > 1 && setN(1)}
     >
       <Silhouette />
+      {n > 0 && <span key={`ring${n}`} className="countdown-ring" aria-hidden="true" />}
       {n > 0 && (
         <span key={n} className="countdown-numeral relative font-display text-[26cqw] leading-none text-bone">
           {n}

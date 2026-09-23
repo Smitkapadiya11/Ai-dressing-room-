@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { SHOP } from "@/lib/shop";
 
+// Set NEXT_PUBLIC_ATTRACT_VIDEO=1 once public/media/attract-loop.mp4 exists.
+const ATTRACT_VIDEO = process.env.NEXT_PUBLIC_ATTRACT_VIDEO === "1";
+
 // In the voice of a house that has been doing this since 1968.
 const LINES = [
   "Zari is drawn, never printed.",
@@ -79,11 +82,11 @@ export default function Poster({ mode = "idle", status }) {
 
       <div className="flex flex-col items-center">
         <span className="poster-hairline mb-[1.4cqw]" />
-        <p className="font-body text-[clamp(9px,1.5cqw,12px)] leading-none font-semibold uppercase tracking-[0.42em] text-muted">
-          Made by
+        <p className="font-display text-[clamp(30px,6.5cqw,56px)] leading-none font-normal tracking-[0.02em] text-bone">
+          Kapadiya <span className="italic text-champagne">&amp;</span> Sons
         </p>
-        <p className="mt-[0.8cqw] font-display text-[clamp(30px,6.5cqw,56px)] leading-none font-normal uppercase tracking-[0.16em] text-champagne">
-          Smit Kapadiya
+        <p className="mt-[1cqw] font-body text-[clamp(9px,1.5cqw,12px)] leading-none font-semibold uppercase tracking-[0.42em] text-muted">
+          The try-on mirror
         </p>
         <span className="poster-hairline mt-[1.4cqw]" />
       </div>
@@ -102,10 +105,19 @@ export default function Poster({ mode = "idle", status }) {
   return (
     <div className="poster">
       <div className="poster-ambient" />
+      {!working && ATTRACT_VIDEO && (
+        <video className="poster-video" src="/media/attract-loop.mp4" poster="/looks/look-crimson.jpg" autoPlay muted loop playsInline aria-hidden="true" />
+      )}
       {!working && (
-        <p className="poster-tap absolute inset-x-0 bottom-[8cqw] text-center text-[clamp(10px,1.7cqw,13px)] font-semibold uppercase tracking-[0.3em] text-champagne">
-          Touch anywhere to begin
-        </p>
+        <div className="absolute inset-x-0 bottom-[7cqw] z-10 flex flex-col items-center">
+          <span className="attract-ring" aria-hidden="true">
+            <span />
+          </span>
+          <p className="mt-[3cqw] text-[clamp(16px,3.2cqw,26px)] font-semibold uppercase tracking-[0.28em] text-champagne">Touch to begin</p>
+          <p className="mt-[2cqw] max-w-[80cqw] text-center text-[clamp(10px,1.6cqw,13px)] leading-[1.5] text-muted">
+            Your photo is used only to make your try-on and is not saved. The finished look is kept for 15 minutes so you can scan it to your phone.
+          </p>
+        </div>
       )}
       <div className={`absolute inset-0 ${!working ? `poster-drift ${line.afterHours ? "poster-slow" : ""}` : ""}`}>
         {block}
