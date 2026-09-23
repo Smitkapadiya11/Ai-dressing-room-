@@ -11,3 +11,8 @@ dbg.mjs
 qa-screenshots
 bakeoff
 .env*
+
+# try-on eval: consented photos and outputs never go in git
+scripts/tryon-eval/photos/*.jpg
+scripts/tryon-eval/photos/*.jpeg
+scripts/tryon-eval/out/

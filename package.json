@@ -10,7 +10,8 @@
     "prep-photos": "node scripts/prep-photos.mjs",
     "build-catalogue": "node scripts/build-catalogue.mjs",
     "qa": "node scripts/qa.mjs",
-    "qa:result": "node scripts/qa-result.mjs"
+    "qa:result": "node scripts/qa-result.mjs",
+    "eval:tryon": "node scripts/tryon-eval/run.mjs"
   },
   "dependencies": {
     "@fontsource/manrope": "^5.3.0",
