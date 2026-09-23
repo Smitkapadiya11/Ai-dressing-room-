@@ -2,6 +2,7 @@ import { steps, features, honesty, system, reasons, faq, closing, contact } from
 import { pricing, SHOW_PRICING } from "@/content/pricing";
 import { clean } from "@/content/clean";
 import { Btn, Head, Label, Section, delay } from "./ui";
+import ContactForm from "./ContactForm";
 
 // Code-native loops for the three steps, until step-*.mp4 exist.
 const STEP_VISUALS = [
@@ -208,6 +209,12 @@ export function Closing() {
             </span>
           ))}
         </h2>
+        <p className="k-lead k-reveal" style={{ ...delay(2), gridColumn: "1 / span 7", marginTop: 28 }}>
+          {closing.formIntro}
+        </p>
+        <div className="k-close__form k-reveal" style={delay(3)}>
+          <ContactForm />
+        </div>
         <div className="k-close__row k-reveal" style={delay(2)}>
           {wa && <Btn href={wa}>Book a demo on WhatsApp</Btn>}
           {contact.email && (

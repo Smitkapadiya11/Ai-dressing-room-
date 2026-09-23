@@ -245,6 +245,23 @@
 .k-faq details p { margin: 0 0 28px; color: var(--k-muted); max-width: 40em; }
 @media (max-width: 860px) { .k-faq, .k-faq__head { grid-column: 1 / -1; } .k-faq__head { margin-bottom: 32px; } }
 
+/* ---------- contact form ---------- */
+.k-close__form { grid-column: 1 / span 8; margin-top: 48px; }
+.k-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+.k-field { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--k-muted); }
+.k-field em { color: var(--k-gold); font-style: normal; }
+.k-field--wide { grid-column: 1 / -1; }
+.k-field input, .k-field textarea { font: inherit; font-size: 1rem; color: var(--k-text); background: var(--k-bg-2); border: 1px solid var(--k-line); border-radius: 4px; padding: 14px 16px; min-height: 52px; transition: border-color 250ms; }
+.k-field input:focus, .k-field textarea:focus { outline: none; border-color: var(--k-gold); }
+.k-field textarea { resize: vertical; }
+.k-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.k-form__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+.k-form__foot p { margin: 0; }
+.k-form__err { color: #F2A7A7; }
+.k-form button[disabled] { opacity: 0.6; }
+@media (max-width: 860px) { .k-close__form { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .k-form { grid-template-columns: 1fr; } }
+
 /* ---------- closing + footer ---------- */
 .k-close { text-align: left; }
 .k-close .k-h1 { grid-column: 1 / span 10; }

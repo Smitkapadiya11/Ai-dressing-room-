@@ -149,6 +149,7 @@ export const faq = {
 export const closing = {
   title: ["Let them see it on themselves.", "Then let them decide."],
   cta: { label: "Book a demo in your shop", href: "#contact" },
+  formIntro: "Tell us about your shop. We'll bring the mirror to you and run it on your own garments.",
   signoff: "Silk is patient. So is a tailor.",
   credit: "Designed & built by Smit Kapadiya",
 };
