@@ -60,9 +60,12 @@ function ProgressLine({ active }) {
 }
 
 export default function Poster({ mode = "idle", status }) {
-  const [line, setLine] = useState(() => currentLine(new Date()));
+  // Picked on the client only: the server renders in UTC, the shop is in IST,
+  // so a server-chosen line mismatches on hydration (React #418).
+  const [line, setLine] = useState({ text: "", afterHours: false });
 
   useEffect(() => {
+    setLine(currentLine(new Date()));
     const t = setInterval(() => setLine(currentLine(new Date())), 30_000);
     return () => clearInterval(t);
   }, []);
