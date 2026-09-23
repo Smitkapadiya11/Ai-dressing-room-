@@ -9,7 +9,22 @@ const FIELDS = [
   { name: "outlets", label: "Number of outlets", type: "number", inputMode: "numeric" },
 ];
 
-export default function ContactForm() {
+// If the email route isn't configured yet (no Resend key), the enquiry is
+// handed to WhatsApp, pre-filled, so no lead is ever lost.
+function toWhatsApp(number, body) {
+  const lines = [
+    "Hello, I'd like a demo of the try-on mirror.",
+    body.name && `Name: ${body.name}`,
+    body.shop && `Shop: ${body.shop}`,
+    body.city && `City: ${body.city}`,
+    body.phone && `Phone: ${body.phone}`,
+    body.outlets && `Outlets: ${body.outlets}`,
+    body.message && `\n${body.message}`,
+  ].filter(Boolean);
+  window.open(`https://wa.me/${number}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
+}
+
+export default function ContactForm({ whatsapp }) {
   const [state, setState] = useState({ status: "idle", msg: "" });
 
   async function submit(e) {
@@ -19,6 +34,11 @@ export default function ContactForm() {
     try {
       const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const json = await res.json().catch(() => ({}));
+      if (res.status === 503 && whatsapp) {
+        toWhatsApp(whatsapp, body);
+        setState({ status: "sent", msg: "Opening WhatsApp with your details. Just press send." });
+        return;
+      }
       if (!res.ok) throw new Error(json.error || "That didn't send. Please try again.");
       setState({ status: "sent", msg: "Thank you. We'll be in touch soon." });
       e.target.reset();

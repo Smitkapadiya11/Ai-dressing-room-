@@ -3,8 +3,9 @@
 
 export const contact = {
   // Leave empty to hide. WhatsApp number in international format, digits only.
-  whatsapp: "",
-  email: "",
+  whatsapp: "917575807403",
+  phoneDisplay: "+91 75758 07403",
+  email: "smitkapadiya.working@gmail.com",
   city: "Surat, Gujarat",
 };
 

@@ -226,7 +226,7 @@ export function Closing() {
           {closing.formIntro}
         </p>
         <div className="k-close__form k-reveal" style={delay(3)}>
-          <ContactForm />
+          <ContactForm whatsapp={contact.whatsapp} />
         </div>
         <div className="k-close__row k-reveal" style={delay(2)}>
           {wa && <Btn href={wa}>Book a demo on WhatsApp</Btn>}
@@ -253,7 +253,12 @@ export function Closing() {
               </p>
               {wa && (
                 <p style={{ margin: "0 0 8px" }}>
-                  <a href={wa}>WhatsApp</a>
+                  <a href={wa}>WhatsApp {contact.phoneDisplay}</a>
+                </p>
+              )}
+              {contact.phoneDisplay && (
+                <p style={{ margin: "0 0 8px" }}>
+                  <a href={`tel:+${contact.whatsapp}`}>Call {contact.phoneDisplay}</a>
                 </p>
               )}
               {contact.email && (

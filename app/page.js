@@ -3,6 +3,7 @@ import "@/styles/tokens.css";
 import "@/styles/home.css";
 import { SITE_URL } from "@/lib/site";
 import { MEDIA } from "@/lib/media";
+import { contact } from "@/content/home";
 import Motion from "@/components/home/Motion";
 import { Nav, Hero, Problem, Origin, Founder } from "@/components/home/Top";
 import { Steps, Features, Honesty, System, Reasons, Plans, Faq, Closing } from "@/components/home/Bottom";
@@ -24,6 +25,9 @@ const JSON_LD = [
     name: "Kapadiya & Sons",
     url: SITE_URL,
     founder: { "@type": "Person", name: "Smit Kapadiya" },
+    email: contact.email,
+    telephone: contact.phoneDisplay,
+    contactPoint: { "@type": "ContactPoint", contactType: "sales", telephone: contact.phoneDisplay, email: contact.email, areaServed: "IN" },
     address: { "@type": "PostalAddress", addressLocality: "Surat", addressRegion: "Gujarat", addressCountry: "IN" },
   },
   {

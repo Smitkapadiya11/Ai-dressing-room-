@@ -39,3 +39,7 @@ Screenshots (local, git-ignored): `qa-screenshots/v2/` (`home-*.png`, `mirror-*.
 
 ## Not done
 - Lighthouse was not run: the Lighthouse CLI isn't installed here. Run `npx lighthouse https://<deploy>/ --form-factor=mobile` against the deploy. The home page ships 104 kB of first-load JS, with no web fonts from third parties and no layout-shifting media.
+
+## Contact details
+- WhatsApp/phone +91 75758 07403 and email smitkapadiya.working@gmail.com are live: closing CTAs, footer, JSON-LD.
+- With no Resend key set, the demo form opens WhatsApp with the enquiry pre-filled instead of failing.

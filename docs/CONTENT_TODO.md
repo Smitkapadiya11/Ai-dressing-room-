@@ -3,9 +3,8 @@
 Placeholders in `content/*.js` look like `{{...}}`. They are stripped before render, so none of them show on the live site. Where one would leave a gap, the item is hidden instead.
 
 ## Contact (blocks the "Book a demo" buttons)
-- [ ] **WhatsApp number**: `content/home.js → contact.whatsapp` (digits, with 91). This turns on the WhatsApp buttons.
-- [ ] **Email**: `contact.email`. This turns on the email link.
-- [ ] **Resend** env vars on Vercel: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, and optionally `CONTACT_FROM_EMAIL` (needs a domain verified in Resend). Until these are set, the form replies "isn't connected yet" and logs the enquiry name.
+- [x] WhatsApp +91 75758 07403 and email smitkapadiya.working@gmail.com are set in `content/home.js`.
+- [ ] **Resend** env vars on Vercel: `RESEND_API_KEY`, `CONTACT_TO_EMAIL` (e.g. smitkapadiya.working@gmail.com), and optionally `CONTACT_FROM_EMAIL`. Until they're set, the form opens WhatsApp with the enquiry pre-filled.
 
 ## Dates and facts
 - [ ] Origin timeline: when you saw the mirror in China, and when you decided to build it (`origin.steps[0..1].when`).
