@@ -68,8 +68,7 @@ export const origin = {
 export const founder = {
   eyebrow: "Who builds it",
   name: "Smit Kapadiya",
-  portrait: "/media/founder.jpg", // placeholder until supplied
-  intro: "I grew up around Surat's cloth trade. I studied computer science. Then I spent a year selling, and learned how a business actually decides to buy. Kapadiya & Sons is where those three meet.",
+  intro: "I studied computer science, then spent a year in sales learning how a business actually decides to buy. Kapadiya & Sons is where the two meet: software built for the shops of Surat.",
   milestones: [
     { when: "2022 – 2025", title: "BCA / B.Sc Computer Science, CHARUSAT", body: "Learned to build software properly." },
     { when: "2025", title: "IT Bench Sales Recruiter, Radiance Technologies, Ahmedabad", body: "Learned how businesses buy, and how to talk to them." },

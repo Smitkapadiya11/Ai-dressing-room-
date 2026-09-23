@@ -21,9 +21,12 @@ export function Head({ eyebrow, title, children }) {
   );
 }
 
-export function Section({ id, className = "", children, label }) {
+// bg: optional still behind the section; backdrop: optional node (e.g. a video) behind it
+export function Section({ id, className = "", children, label, bg, backdrop }) {
   return (
-    <section id={id} aria-label={label} className={`k-section ${className}`}>
+    <section id={id} aria-label={label} className={`k-section ${bg || backdrop ? "k-section--media" : ""} ${className}`}>
+      {bg && <img className="k-section__bg" src={bg} alt="" loading="lazy" aria-hidden="true" />}
+      {backdrop}
       <div className="k-wrap k-grid">{children}</div>
     </section>
   );

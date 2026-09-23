@@ -3,6 +3,8 @@ import { pricing, SHOW_PRICING } from "@/content/pricing";
 import { clean } from "@/content/clean";
 import { Btn, Head, Label, Section, delay } from "./ui";
 import ContactForm from "./ContactForm";
+import { MEDIA } from "@/lib/media";
+import Clip from "./Clip";
 
 // Code-native loops for the three steps, until step-*.mp4 exist.
 const STEP_VISUALS = [
@@ -30,7 +32,7 @@ export function Steps() {
         {steps.items.map((s, i) => (
           <li key={s.n} className={`k-step k-reveal ${s.honest ? "k-step--honest" : ""}`} style={delay(i, 140)}>
             <div className="k-step__vis" aria-hidden="true">
-              {STEP_VISUALS[i]}
+              {MEDIA.steps[i] ? <Clip src={MEDIA.steps[i]} concept={i === 2} /> : STEP_VISUALS[i]}
             </div>
             <span className="k-step__n">{s.n}</span>
             <h3 className="k-h3">{s.title}</h3>
@@ -50,6 +52,7 @@ export function Features() {
       <div className="k-feat">
         {features.live.map((f, i) => (
           <div key={f.title} className="k-feat__item k-reveal" style={delay(i % 2)}>
+            {MEDIA.features[i] && <img className="k-feat__img" src={MEDIA.features[i]} alt="" loading="lazy" />}
             <h3 className="k-h3">{f.title}</h3>
             <p>{f.body}</p>
           </div>
@@ -70,7 +73,7 @@ export function Features() {
 // Slots stay as labelled placeholders until consented demo photos from the real app exist.
 export function Honesty() {
   return (
-    <Section id="promise" label="Our promise" className="k-honest">
+    <Section id="promise" label="Our promise" className="k-honest" bg={MEDIA.honesty.bg}>
       <div className="k-honest__copy">
         <div className="k-reveal">
           <Label>{honesty.eyebrow}</Label>
@@ -92,8 +95,17 @@ export function Honesty() {
       </div>
       <figure className="k-honest__vis k-reveal" style={{ ...delay(2), margin: 0 }}>
         <div className="k-pair">
-          <div className="k-pair__slot">Original photo</div>
-          <div className="k-pair__slot">Try-on result</div>
+          {MEDIA.honesty.before && MEDIA.honesty.after ? (
+            <>
+              <img className="k-pair__slot" src={MEDIA.honesty.before} alt="Original photo, taken on the mirror" loading="lazy" />
+              <img className="k-pair__slot" src={MEDIA.honesty.after} alt="The same person after try-on, only the clothes changed" loading="lazy" />
+            </>
+          ) : (
+            <>
+              <div className="k-pair__slot">Original photo</div>
+              <div className="k-pair__slot">Try-on result</div>
+            </>
+          )}
         </div>
         <figcaption className="k-pair__cap">{honesty.caption}</figcaption>
       </figure>
@@ -111,6 +123,7 @@ export function System() {
         <p className="k-lead">{system.body}</p>
       </div>
       <div className="k-sys__dia" data-reveal>
+        {MEDIA.product && <img className="k-sys__product" src={MEDIA.product} alt="The Kapadiya & Sons mirror kiosk" loading="lazy" />}
         <svg viewBox="0 0 600 140" role="img" aria-label={system.nodes.join(" → ")}>
           <path d="M 40 60 H 560" pathLength="1" className="k-sys__path" stroke="#C9A961" strokeWidth="1.2" fill="none" />
           <circle r="4" fill="#E3CFA0" className="k-sys__pulse" />
@@ -131,7 +144,7 @@ export function System() {
 
 export function Reasons() {
   return (
-    <Section id="why" label="Why shops buy it">
+    <Section id="why" label="Why shops buy it" bg={MEDIA.benefits} className={MEDIA.benefits ? "k-band" : ""}>
       <Head eyebrow={reasons.eyebrow} title={reasons.title} />
       <div className="k-reasons">
         {reasons.items.map((r, i) => (
@@ -201,7 +214,7 @@ export function Closing() {
   const wa = contact.whatsapp && `https://wa.me/${contact.whatsapp}`;
   return (
     <>
-      <Section id="contact" label="Book a demo" className="k-close">
+      <Section id="contact" label="Book a demo" className={`k-close ${MEDIA.ctaSilk ? "k-close--video" : ""}`} backdrop={MEDIA.ctaSilk && <Clip src={MEDIA.ctaSilk} className="k-section__bgclip" />}>
         <h2 className="k-h1">
           {closing.title.map((l, i) => (
             <span key={i} className="k-line k-reveal" style={delay(i)}>

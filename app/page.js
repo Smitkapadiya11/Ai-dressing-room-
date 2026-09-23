@@ -1,9 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
 import { redirect } from "next/navigation";
 import "@/styles/tokens.css";
 import "@/styles/home.css";
 import { SITE_URL } from "@/lib/site";
+import { MEDIA } from "@/lib/media";
 import Motion from "@/components/home/Motion";
 import { Nav, Hero, Problem, Origin, Founder } from "@/components/home/Top";
 import { Steps, Features, Honesty, System, Reasons, Plans, Faq, Closing } from "@/components/home/Bottom";
@@ -40,9 +39,8 @@ const JSON_LD = [
 // A physical mirror pinned to the root URL sets KIOSK_MODE=1 and never sees the marketing page.
 export default function Home() {
   if (process.env.KIOSK_MODE === "1") redirect("/mirror");
-  const hasPortrait = fs.existsSync(path.join(process.cwd(), "public/media/founder.jpg"));
   return (
-    <div className="k-page">
+    <div className={`k-page ${MEDIA.grain ? "k-page--grain" : ""}`} style={MEDIA.grain ? { "--grain": `url(${MEDIA.grain})` } : undefined}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <Motion />
       <Nav />
@@ -50,7 +48,7 @@ export default function Home() {
         <Hero />
         <Problem />
         <Origin />
-        <Founder hasPortrait={hasPortrait} />
+        <Founder />
         <Steps />
         <Features />
         <Honesty />

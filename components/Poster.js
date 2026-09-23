@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SHOP } from "@/lib/shop";
 
-// Set NEXT_PUBLIC_ATTRACT_VIDEO=1 once public/media/attract-loop.mp4 exists.
+// On automatically when public/media/mirror/attract-loop.mp4 or .webm exists at build (next.config.mjs).
 const ATTRACT_VIDEO = process.env.NEXT_PUBLIC_ATTRACT_VIDEO === "1";
 
 // In the voice of a house that has been doing this since 1968.
@@ -106,7 +106,10 @@ export default function Poster({ mode = "idle", status }) {
     <div className="poster">
       <div className="poster-ambient" />
       {!working && ATTRACT_VIDEO && (
-        <video className="poster-video" src="/media/attract-loop.mp4" poster="/looks/look-crimson.jpg" autoPlay muted loop playsInline aria-hidden="true" />
+        <video className="poster-video" poster="/media/mirror/attract-poster.jpg" autoPlay muted loop playsInline aria-hidden="true">
+          <source src="/media/mirror/attract-loop.webm" type="video/webm" />
+          <source src="/media/mirror/attract-loop.mp4" type="video/mp4" />
+        </video>
       )}
       {!working && (
         <div className="absolute inset-x-0 bottom-[7cqw] z-10 flex flex-col items-center">

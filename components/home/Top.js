@@ -1,6 +1,8 @@
 import { hero, problem, origin, founder } from "@/content/home";
 import { clean } from "@/content/clean";
 import { Btn, Head, Label, Section, delay } from "./ui";
+import { MEDIA } from "@/lib/media";
+import Clip from "./Clip";
 
 export function Nav() {
   return (
@@ -23,7 +25,13 @@ export function Nav() {
 
 export function Hero() {
   return (
-    <section className="k-hero" aria-label="Introduction">
+    <section className={`k-hero ${MEDIA.hero ? "k-hero--video" : ""}`} aria-label="Introduction">
+      {MEDIA.hero && (
+        <div className="k-hero__bg" aria-hidden="true">
+          <Clip src={MEDIA.hero} className={MEDIA.heroPortrait ? "k-only-wide" : ""} concept />
+          {MEDIA.heroPortrait && <Clip src={MEDIA.heroPortrait} className="k-only-narrow" concept />}
+        </div>
+      )}
       <div className="k-wrap k-grid">
         <div className="k-hero__copy">
           <div className="k-reveal">
@@ -46,7 +54,7 @@ export function Hero() {
             </Btn>
           </div>
         </div>
-        <div className="k-hero__visual k-reveal" style={delay(3)}>
+        {!MEDIA.hero && <div className="k-hero__visual k-reveal" style={delay(3)}>
           {/* Code-native stand-in until /media/hero-loop.mp4 exists: the garment drapes down over the capture. */}
           <div className="k-mirror" role="img" aria-label="A customer in the mirror, then the same customer wearing a new outfit">
             <div className="k-mirror__glass">
@@ -56,7 +64,7 @@ export function Hero() {
             </div>
             <span className="k-mirror__tag">Before · After</span>
           </div>
-        </div>
+        </div>}
       </div>
     </section>
   );
@@ -68,8 +76,9 @@ export function Problem() {
       <Head eyebrow={problem.eyebrow} title={problem.title} />
       <div className="k-rows">
         {problem.items.map((it, i) => (
-          <div key={it.k} className="k-row k-reveal" style={delay(i)}>
+          <div key={it.k} className={`k-row k-reveal ${MEDIA.problem[i] ? "k-row--img" : ""}`} style={delay(i)}>
             <span className="k-row__k">{it.k}</span>
+            {MEDIA.problem[i] && <img className="k-row__img" src={MEDIA.problem[i]} alt="" loading="lazy" />}
             <h3 className="k-h3">{it.title}</h3>
             <p>{it.body}</p>
           </div>
@@ -86,6 +95,7 @@ export function Origin() {
       <ol className="k-timeline" style={{ listStyle: "none", margin: 0 }}>
         {origin.steps.map((s, i) => (
           <li key={i} className="k-tl k-reveal" style={delay(i, 140)}>
+            {MEDIA.origin[i] && <img className="k-tl__img" src={MEDIA.origin[i]} alt="" loading="lazy" />}
             <div className="k-tl__when">{clean(s.when)}</div>
             <h3 className="k-h3">{s.title}</h3>
             <p>{s.body}</p>
@@ -96,14 +106,15 @@ export function Origin() {
   );
 }
 
-// The portrait slot shows a monogram until /public/media/founder.jpg is supplied.
-export function Founder({ hasPortrait }) {
+// The portrait slot shows a monogram until public/media/home/founder.jpg exists.
+export function Founder() {
+  const portrait = MEDIA.founder;
   return (
     <Section id="founder" label="The founder">
       <div className="k-founder__side k-reveal">
         <div className="k-portrait">
-          {hasPortrait ? (
-            <img src={founder.portrait} alt={`Portrait of ${founder.name}`} loading="lazy" />
+          {portrait ? (
+            <img src={portrait} alt={`Portrait of ${founder.name}`} loading="lazy" />
           ) : (
             <span className="k-portrait__ph" aria-hidden="true">
               SK
