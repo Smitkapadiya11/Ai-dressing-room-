@@ -20,7 +20,7 @@ export async function POST(req) {
   const to = process.env.CONTACT_TO_EMAIL;
   if (!key || !to) {
     console.error("[contact] RESEND_API_KEY or CONTACT_TO_EMAIL is not set; enquiry not sent:", data.shop || data.name);
-    return Response.json({ error: "The form isn't connected yet. Please reach us on WhatsApp." }, { status: 503 });
+    return Response.json({ error: "The form isn't connected yet. Please try again later." }, { status: 503 });
   }
 
   const rows = FIELDS.map((k) => `<tr><td style="padding:4px 12px 4px 0;color:#666">${k}</td><td>${esc(data[k] || "—")}</td></tr>`).join("");
@@ -36,7 +36,7 @@ export async function POST(req) {
   });
   if (!res.ok) {
     console.error("[contact] Resend failed:", res.status, (await res.text()).slice(0, 300));
-    return Response.json({ error: "That didn't send. Please try again, or reach us on WhatsApp." }, { status: 502 });
+    return Response.json({ error: "That didn't send. Please try again." }, { status: 502 });
   }
   return Response.json({ ok: true });
 }

@@ -139,7 +139,7 @@ export const faq = {
     { q: "Does it change how I look?", a: "No. Only the clothing changes. It doesn't slim you, lighten your skin, smooth your face or add makeup. If a result ever does, that's a bug and we want to see it." },
     { q: "What hardware do I need?", a: "A portrait touch display, a camera and an internet connection. We can supply all of it on rent. {{TBD: exact spec sheet}}" },
     { q: "How long does setup take?", a: "{{TBD}}" },
-    { q: "Is customer data stored?", a: "The camera photo is used to make the try-on and is not saved. The finished try-on is held for 15 minutes so the customer can scan it to their phone. After that, the link stops working." },
+    { q: "Is customer data stored?", a: "The camera photo is used to make the try-on and is not saved. The finished try-on is stored on our server so the customer can scan it to their phone, and that link stops working after 15 minutes." },
     { q: "Can I use my own catalogue photos?", a: "Yes. That's the point. A clear, well-lit photo of each garment is enough to start." },
     { q: "What if the internet goes down?", a: "The try-on needs a connection to generate the result. The mirror keeps running its attract loop and starts try-ons again once the connection returns. {{TBD: offline plan for large stores}}" },
     { q: "How do I pay?", a: "Monthly. {{TBD: payment methods and billing terms}}" },

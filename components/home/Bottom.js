@@ -250,7 +250,7 @@ export function Closing() {
               )}
             </div>
             <p style={{ margin: 0 }}>
-              Privacy: the camera photo is used only to make the try-on and is not saved. The finished look is held for 15 minutes so it can be scanned to a phone.
+              Privacy: the camera photo is used only to make the try-on and is not saved. The finished look is stored so the QR works, and its link stops working after 15 minutes.
             </p>
           </div>
           <div className="k-foot__base">

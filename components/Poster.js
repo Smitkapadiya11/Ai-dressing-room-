@@ -115,7 +115,7 @@ export default function Poster({ mode = "idle", status }) {
           </span>
           <p className="mt-[3cqw] text-[clamp(16px,3.2cqw,26px)] font-semibold uppercase tracking-[0.28em] text-champagne">Touch to begin</p>
           <p className="mt-[2cqw] max-w-[80cqw] text-center text-[clamp(10px,1.6cqw,13px)] leading-[1.5] text-muted">
-            Your photo is used only to make your try-on and is not saved. The finished look is kept for 15 minutes so you can scan it to your phone.
+            Your photo is used only to make your try-on and is not saved. The finished look is stored so you can scan it to your phone; the link expires after 15 minutes.
           </p>
         </div>
       )}

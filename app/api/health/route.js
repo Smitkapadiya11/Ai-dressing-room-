@@ -43,7 +43,11 @@ async function blobSelfTest() {
 
 export async function GET(req) {
   const keyConfigured =
-    PROVIDER === "gemini" ? Boolean(process.env.GEMINI_API_KEY) : Boolean(process.env.OPENAI_API_KEY);
+    PROVIDER === "gemini"
+      ? Boolean(process.env.GEMINI_API_KEY)
+      : PROVIDER === "qwen"
+      ? Boolean(process.env.QWEN_API_URL || true)
+      : Boolean(process.env.OPENAI_API_KEY);
   const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
   const params = new URL(req.url).searchParams;
