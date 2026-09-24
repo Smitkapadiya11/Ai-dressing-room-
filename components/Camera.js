@@ -2,39 +2,43 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 
-// Capture at the video's native size, downscale only past 1600 on the long
-// edge. The render comes back at 1024x1536, so anything larger is detail
-// the model throws away — and a 2560px frame at q0.95 was a multi-MB
-// upload on shop wifi or 5G, sent twice (body read + fitting), brushing
-// Vercel's 4.5 MB request limit.
-function grabFrame(video, maxEdge = 1600) {
-  const vw = video.videoWidth || 1080;
-  const vh = video.videoHeight || 1920;
-  const scale = Math.min(1, maxEdge / Math.max(vw, vh));
-  const w = Math.round(vw * scale);
-  const h = Math.round(vh * scale);
+// Every frame is centre-cropped to 2:3 at 1024x1536 — the exact shape the
+// render comes back in. Any other shape and the before/after slider no
+// longer lines up (each side is object-cover cropped differently), and the
+// model has to re-frame the body, which is where drift creeps in. It also
+// keeps the upload small: the frame is sent twice (body read + fitting).
+const OUT_W = 1024;
+const OUT_H = 1536;
+
+function drawCropped(source, sw, sh, mirror) {
+  const target = OUT_W / OUT_H;
+  let cw = sw;
+  let ch = sh;
+  if (sw / sh > target) cw = Math.round(sh * target);
+  else ch = Math.round(sw / target);
+  const sx = Math.round((sw - cw) / 2);
+  const sy = Math.round((sh - ch) / 2);
   const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = OUT_W;
+  canvas.height = OUT_H;
   const ctx = canvas.getContext("2d");
-  // Mirror the canvas the same way the preview is mirrored, so the saved
-  // frame matches what she was looking at.
-  ctx.translate(w, 0);
-  ctx.scale(-1, 1);
-  ctx.drawImage(video, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.9);
+  if (mirror) {
+    // Mirror the canvas the same way the preview is mirrored, so the saved
+    // frame matches what she was looking at.
+    ctx.translate(OUT_W, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(source, sx, sy, cw, ch, 0, 0, OUT_W, OUT_H);
+  return canvas.toDataURL("image/jpeg", 0.92);
 }
 
-async function frameFromFile(file, maxEdge = 1600) {
+function grabFrame(video) {
+  return drawCropped(video, video.videoWidth || 1080, video.videoHeight || 1920, true);
+}
+
+async function frameFromFile(file) {
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
-  const w = Math.round(bitmap.width * scale);
-  const h = Math.round(bitmap.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  canvas.getContext("2d").drawImage(bitmap, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.9);
+  return drawCropped(bitmap, bitmap.width, bitmap.height, false);
 }
 
 // Camera refused or missing is never a dead end and never a silent
