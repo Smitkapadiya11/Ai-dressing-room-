@@ -16,6 +16,7 @@ export default function ModelPicker({ engines, value, onChange }) {
         <span className="model-chip-dot" />
         <span className="text-muted">Engine</span>
         <span className="text-bone">{current.label}</span>
+        {current.cost && <span className="model-cost">({current.cost})</span>}
       </button>
 
       {open && <button type="button" aria-label="Close engine list" className="model-scrim" onClick={() => setOpen(false)} />}
@@ -33,7 +34,10 @@ export default function ModelPicker({ engines, value, onChange }) {
               setOpen(false);
             }}
           >
-            <span className="text-bone">{e.label}</span>
+            <span className="text-bone">
+              {e.label}
+              {e.cost && <span className="model-cost"> ({e.cost})</span>}
+            </span>
             <span className="text-muted">{e.vendor || e.model}</span>
           </button>
         ))}

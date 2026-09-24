@@ -1029,3 +1029,4 @@
   .bar-loader-bar { animation: barLoaderCalm 2s ease-in-out infinite !important; }
   @keyframes barLoaderCalm { 50% { background-color: #C9A961; } }
 }
+.model-cost { color: #C9A961; font-size: 0.85em; white-space: nowrap; }
