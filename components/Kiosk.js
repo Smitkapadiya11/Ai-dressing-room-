@@ -157,8 +157,14 @@ export default function Kiosk() {
     // generate just goes out without it.
     const bodyRead = bodyReadRef.current?.bodyRead || null;
 
+    // Never spin forever: a lost response (network drop, a suspended tab)
+    // or a render that overruns comes back to the drawer with a message.
+    const controller = new AbortController();
+    const giveUp = setTimeout(() => controller.abort(), 100_000);
+
     try {
       const res = await fetch("/api/tryon", {
+        signal: controller.signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -169,7 +175,10 @@ export default function Kiosk() {
           engine,
         }),
       });
-      const data = await res.json();
+      // A platform timeout returns an HTML page, not JSON — do not let that
+      // surface as a parse error.
+      const data = await res.json().catch(() => ({}));
+      clearTimeout(giveUp);
       clearInterval(cycleRef.current);
       if (!res.ok) throw new Error(data.error || "That look did not come through.");
 
@@ -188,8 +197,13 @@ export default function Kiosk() {
           .catch(() => {});
       }
     } catch (e) {
+      clearTimeout(giveUp);
       clearInterval(cycleRef.current);
-      setError(e.message || "That look did not come through.");
+      setError(
+        e.name === "AbortError"
+          ? "That look took too long to arrive. Tap the garment to try again, or pick a faster engine."
+          : e.message || "That look did not come through."
+      );
       setStage("drawer");
     }
   }

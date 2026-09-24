@@ -79,6 +79,7 @@ export async function POST(req) {
     return Response.json({ image, bodyRead, recommendedSize, suggestedColours, ms, costInr, engine, cached: false });
   } catch (e) {
     // Never fall back to a pre-rendered image — say plainly what happened.
-    return Response.json({ error: e.message || "That look did not come through." }, { status: 500 });
+    const error = e.name === "TimeoutError" ? "That engine is running slow right now. Try again, or pick a faster engine." : e.message || "That look did not come through.";
+    return Response.json({ error }, { status: 500 });
   }
 }
