@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SHOP } from "@/lib/shop";
+import BarLoader from "@/components/BarLoader";
 
 // On automatically when public/media/mirror/attract-loop.mp4 or .webm exists at build (next.config.mjs).
 const ATTRACT_VIDEO = process.env.NEXT_PUBLIC_ATTRACT_VIDEO === "1";
@@ -74,6 +75,7 @@ export default function Poster({ mode = "idle", status }) {
 
   const block = (
     <div className="poster-center poster-breathe">
+      {working && <BarLoader className="poster-loader mb-[2.4cqw]" />}
       {working && status && (
         <p
           key={status}

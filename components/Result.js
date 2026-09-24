@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import QRCode from "qrcode";
 import { BrandMark } from "./Brand";
+import BarLoader from "./BarLoader";
 import { inr } from "@/lib/catalogue";
 import { recommend } from "@/lib/recommend";
 
@@ -246,7 +247,7 @@ export default function Result({ capturedPhoto, garment, colourway, result, veri
             ) : (
               <button type="button" onClick={() => setQrOpen(true)} disabled={qrState === "loading"} className="action">
                 {qrState === "loading" ? (
-                  <span className="action-spinner" />
+                  <BarLoader size="sm" />
                 ) : (
                   <Icon d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2" />
                 )}

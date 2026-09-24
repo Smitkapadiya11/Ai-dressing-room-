@@ -787,11 +787,6 @@
   .action:not(:disabled):not(.action-primary):not(.action-on):hover { border-color: rgba(201, 169, 97, 0.7); background: rgba(30, 33, 39, 0.8); }
   .action-primary:hover { filter: brightness(1.06); }
 }
-.action-spinner {
-  height: 16px; width: 16px; border-radius: 9999px;
-  border: 2px solid rgba(245, 243, 239, 0.25); border-top-color: #C9A961;
-  animation: spin 800ms linear infinite;
-}
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .compare-root {
@@ -1009,3 +1004,28 @@
 }
 .model-option.on { border-color: #C9A961; background: rgba(201, 169, 97, 0.1); }
 .model-option .text-muted { font-size: 0.8em; }
+
+/* ---------- Bar loader — the house loading icon ---------- */
+.bar-loader { --bar-w: 3px; --bar-h: 20px; --bar-gap: 5px; display: inline-flex; align-items: center; height: calc(var(--bar-h) * 1.75 * 1.5); }
+.bar-loader-sm { --bar-w: 2px; --bar-h: 9px; --bar-gap: 3px; height: 24px; }
+.bar-loader-bar {
+  display: inline-block;
+  width: var(--bar-w);
+  height: var(--bar-h);
+  border-radius: 10px;
+  background-color: rgba(245, 243, 239, 0.5);
+  will-change: transform, background-color;
+  animation: barLoaderPulse 1s linear infinite;
+}
+.bar-loader-bar:nth-child(2) { height: calc(var(--bar-h) * 1.75); margin: 0 var(--bar-gap); animation-delay: 0.25s; }
+.bar-loader-bar:nth-child(3) { animation-delay: 0.5s; }
+@keyframes barLoaderPulse {
+  20% { background-color: #C9A961; transform: scaleY(1.5); }
+  40% { transform: scaleY(1); }
+}
+.poster-loader { animation: posterLineIn 1200ms var(--ease-enter) both; }
+@media (prefers-reduced-motion: reduce) {
+  /* Keep it alive but calm: a slow colour pulse, no scaling. */
+  .bar-loader-bar { animation: barLoaderCalm 2s ease-in-out infinite !important; }
+  @keyframes barLoaderCalm { 50% { background-color: #C9A961; } }
+}
