@@ -30,7 +30,6 @@ const STATUS_LINES = [
   "Draping the fabric",
   "Setting the fall of the pleats",
   "Matching the light in the room",
-  "Finishing",
 ];
 
 export default function Kiosk() {
@@ -149,7 +148,9 @@ export default function Kiosk() {
 
     clearInterval(cycleRef.current);
     cycleRef.current = setInterval(() => {
-      setStatusIndex((i) => Math.min(i + 1, STATUS_LINES.length - 1));
+      // A long render must never look frozen on one line: after the first
+      // pass, keep cycling the working lines (never "Reading your frame").
+      setStatusIndex((i) => (i + 1 < STATUS_LINES.length ? i + 1 : 2));
     }, 2600);
 
     // Never awaited — if it hasn't resolved by the time she picks, the

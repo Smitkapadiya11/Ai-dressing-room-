@@ -1,5 +1,6 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { after } from "next/server";
 import { byId } from "@/lib/catalogue";
 import { cacheKey, readCache, writeCache } from "@/lib/cache";
 import { generateTryOn, inlineOf, parseBodyRead } from "@/lib/engine";
@@ -69,7 +70,8 @@ export async function POST(req) {
       colourway: colourwayObj,
       engine,
     });
-    await writeCache(key, Buffer.from(inlineOf(image).data, "base64"));
+    // Upload to Blob after the response is sent — she shouldn't wait on it.
+    after(() => writeCache(key, Buffer.from(inlineOf(image).data, "base64")));
 
     const ms = Date.now() - t0;
     logFitting({ time: new Date().toISOString(), garment: garment.id, colourway: colourwayObj?.name || null, provider: PROVIDER, engine, tier: TIER, ms, costInr, cached: false });

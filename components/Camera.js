@@ -2,11 +2,12 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 
-// Capture at the video's native size, downscale only past 2560 on the long
-// edge — high enough that a modern phone or webcam's true resolution comes
-// through instead of being clipped to an arbitrary low ceiling. A soft
-// capture was almost always this ceiling, not the camera.
-function grabFrame(video, maxEdge = 2560) {
+// Capture at the video's native size, downscale only past 1600 on the long
+// edge. The render comes back at 1024x1536, so anything larger is detail
+// the model throws away — and a 2560px frame at q0.95 was a multi-MB
+// upload on shop wifi or 5G, sent twice (body read + fitting), brushing
+// Vercel's 4.5 MB request limit.
+function grabFrame(video, maxEdge = 1600) {
   const vw = video.videoWidth || 1080;
   const vh = video.videoHeight || 1920;
   const scale = Math.min(1, maxEdge / Math.max(vw, vh));
@@ -21,10 +22,10 @@ function grabFrame(video, maxEdge = 2560) {
   ctx.translate(w, 0);
   ctx.scale(-1, 1);
   ctx.drawImage(video, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.95);
+  return canvas.toDataURL("image/jpeg", 0.9);
 }
 
-async function frameFromFile(file, maxEdge = 2560) {
+async function frameFromFile(file, maxEdge = 1600) {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const w = Math.round(bitmap.width * scale);
@@ -33,7 +34,7 @@ async function frameFromFile(file, maxEdge = 2560) {
   canvas.width = w;
   canvas.height = h;
   canvas.getContext("2d").drawImage(bitmap, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.95);
+  return canvas.toDataURL("image/jpeg", 0.9);
 }
 
 // Camera refused or missing is never a dead end and never a silent
