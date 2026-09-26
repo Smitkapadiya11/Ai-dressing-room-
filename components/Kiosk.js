@@ -40,20 +40,6 @@ export default function Kiosk() {
   const [result, setResult] = useState(null);
   const [verified, setVerified] = useState(null);
   const [error, setError] = useState(null);
-  // Operator's engine choice — deliberately survives the idle reset.
-  const [engines, setEngines] = useState([]);
-  const [engine, setEngine] = useState(null);
-
-  useEffect(() => {
-    fetch("/api/tryon/providers")
-      .then((r) => r.json())
-      .then((d) => {
-        setEngines(d.engines || []);
-        setEngine((cur) => cur || d.defaultEngine);
-      })
-      .catch(() => {});
-  }, []);
-
   const capturedRef = useRef(null);
   // TRICK ONE lives here: holds the body-read response once it resolves,
   // but nothing ever awaits it. If runFit() runs before this is set, the
@@ -172,7 +158,6 @@ export default function Kiosk() {
           garmentId: garment.id,
           colourway: colourway?.name,
           bodyRead,
-          engine,
         }),
       });
       // A platform timeout returns an HTML page, not JSON — do not let that
@@ -201,7 +186,7 @@ export default function Kiosk() {
       clearInterval(cycleRef.current);
       setError(
         e.name === "AbortError"
-          ? "That look took too long to arrive. Tap the garment to try again, or pick a faster engine."
+          ? "That look took too long to arrive. Tap the garment to try again."
           : e.message || "That look did not come through."
       );
       setStage("drawer");
@@ -265,7 +250,7 @@ export default function Kiosk() {
                 {error}
               </p>
             )}
-            <Drawer capturedPhoto={capturedRef.current} onPick={runFit} engines={engines} engine={engine} onEngine={setEngine} />
+            <Drawer capturedPhoto={capturedRef.current} onPick={runFit} />
           </>
         )}
 

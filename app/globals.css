@@ -974,37 +974,6 @@
   .hero-in { clip-path: none; transition: opacity 200ms; }
 }
 
-/* ---------- Engine picker (garment drawer) ---------- */
-.model-chip {
-  display: inline-flex; align-items: center; gap: 0.6em; flex-shrink: 0;
-  min-height: 36px; padding: 0 1em; border-radius: 999px;
-  border: 1px solid rgba(201, 169, 97, 0.45);
-  font-size: clamp(10px, 1.7cqw, 12px); letter-spacing: 0.04em; white-space: nowrap;
-}
-.model-chip:hover { border-color: #C9A961; }
-.model-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: #C9A961; }
-.model-scrim { position: absolute; inset: 0; z-index: 20; background: rgba(0, 0, 0, 0.35); cursor: default; }
-.model-drawer {
-  position: absolute; left: 4cqw; right: 4cqw; bottom: 0; z-index: 21;
-  display: grid; gap: 6px; padding: 14px 14px 18px;
-  border: 1px solid rgba(201, 169, 97, 0.35); border-bottom: 0; border-radius: 16px 16px 0 0;
-  background: rgba(14, 12, 10, 0.97);
-  transform: translateY(105%); transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  pointer-events: none;
-}
-.model-drawer.open { transform: none; pointer-events: auto; }
-.model-drawer-title {
-  font-size: clamp(9px, 1.6cqw, 12px); font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.26em; color: #C9A961; margin-bottom: 4px;
-}
-.model-option {
-  display: flex; justify-content: space-between; align-items: center; gap: 1em;
-  min-height: 48px; padding: 0 14px; border-radius: 10px;
-  border: 1px solid rgba(245, 243, 239, 0.12); font-size: clamp(12px, 2cqw, 15px); text-align: left;
-}
-.model-option.on { border-color: #C9A961; background: rgba(201, 169, 97, 0.1); }
-.model-option .text-muted { font-size: 0.8em; }
-
 /* ---------- Bar loader — the house loading icon ---------- */
 .bar-loader { --bar-w: 3px; --bar-h: 20px; --bar-gap: 5px; display: inline-flex; align-items: center; height: calc(var(--bar-h) * 1.75 * 1.5); }
 .bar-loader-sm { --bar-w: 2px; --bar-h: 9px; --bar-gap: 3px; height: 24px; }
@@ -1029,4 +998,17 @@
   .bar-loader-bar { animation: barLoaderCalm 2s ease-in-out infinite !important; }
   @keyframes barLoaderCalm { 50% { background-color: #C9A961; } }
 }
-.model-cost { color: #C9A961; font-size: 0.85em; white-space: nowrap; }
+
+/* ---------- AI Dressing Room ambience (kiosk + shared look) ---------- */
+.welcome::before { content: ""; position: absolute; inset: -10%; z-index: -1; pointer-events: none; filter: blur(60px); opacity: 0.5;
+  background: radial-gradient(40% 35% at 80% 20%, rgba(201,169,97,0.35), transparent 70%), radial-gradient(45% 40% at 15% 85%, rgba(122,31,43,0.55), transparent 70%);
+  animation: ambientDrift 16s ease-in-out infinite alternate; }
+.welcome { isolation: isolate; }
+@keyframes ambientDrift { to { transform: translate3d(-4%, 3%, 0) scale(1.08); } }
+
+.look-page { position: relative; isolation: isolate; overflow: hidden;
+  background: radial-gradient(60% 40% at 50% 0%, rgba(122,31,43,0.45), transparent 70%), radial-gradient(50% 40% at 50% 100%, rgba(201,169,97,0.18), transparent 70%), #0C0B0A; }
+.look-cheer { margin: 0; font-family: "Playfair Display", Georgia, serif; font-style: italic; font-size: clamp(1.6rem, 6vw, 2.4rem); color: #E3CFA0; animation: lookIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.look-img { box-shadow: 0 0 0 1px rgba(201,169,97,0.35), 0 30px 80px rgba(0,0,0,0.6), 0 0 80px rgba(201,169,97,0.15); border-radius: 20px; animation: lookIn 1100ms 200ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes lookIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+@media (prefers-reduced-motion: reduce) { .welcome::before, .look-cheer, .look-img { animation: none; } }

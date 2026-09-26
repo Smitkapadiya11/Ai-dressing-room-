@@ -5,6 +5,10 @@ import { Btn, Head, Label, Section, delay } from "./ui";
 import ContactForm from "./ContactForm";
 import { MEDIA } from "@/lib/media";
 import Clip from "./Clip";
+import Icon from "./Icon";
+
+const FEATURE_ICONS = ["hanger", "spark", "qr", "mirror", "play"];
+const REASON_ICONS = ["eye", "clock", "heart", "crown", "wallet", "phone"];
 
 // Code-native loops for the three steps, until step-*.mp4 exist.
 const STEP_VISUALS = [
@@ -53,6 +57,7 @@ export function Features() {
         {features.live.map((f, i) => (
           <div key={f.title} className="k-feat__item k-reveal" style={delay(i % 2)}>
             {MEDIA.features[i] && <img className="k-feat__img" src={MEDIA.features[i]} alt="" loading="lazy" />}
+            <span className="dr-ico"><Icon name={FEATURE_ICONS[i] || "spark"} /></span>
             <h3 className="k-h3">{f.title}</h3>
             <p>{f.body}</p>
           </div>
@@ -149,6 +154,7 @@ export function Reasons() {
       <div className="k-reasons">
         {reasons.items.map((r, i) => (
           <div key={r.title} className="k-reason k-reveal" style={delay(i % 3)}>
+            <span className="dr-ico"><Icon name={REASON_ICONS[i] || "spark"} /></span>
             <h3 className="k-h3">{r.title}</h3>
             <p>{r.body}</p>
           </div>
@@ -201,7 +207,10 @@ export function Faq() {
       <div className="k-faq">
         {items.map((f) => (
           <details key={f.q} className="k-reveal">
-            <summary>{f.q}</summary>
+            <summary>
+              {f.q}
+              <Icon name="plus" size={18} className="dr-faq-plus" />
+            </summary>
             <p>{f.a}</p>
           </details>
         ))}

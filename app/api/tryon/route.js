@@ -39,7 +39,7 @@ export async function POST(req) {
   const t0 = Date.now();
   const personBytes = Buffer.from(inlineOf(person).data, "base64");
   const colourwayObj = garment.colourways.find((c) => c.name === colourway) || null;
-  const key = cacheKey({ personBytes, garmentId, colourway: colourwayObj?.name || "", provider: engine === "house" ? PROVIDER : engine, tier: TIER });
+  const key = cacheKey({ personBytes, garmentId, colourway: colourwayObj?.name || "", provider: `${PROVIDER}:kapadiya-ai-v1.1`, tier: TIER });
   const { recommendedSize, suggestedColours } = parseBodyRead(bodyRead);
 
   // THE CACHE — the same photo through the same garment tonight should

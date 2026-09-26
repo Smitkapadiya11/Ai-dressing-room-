@@ -32,5 +32,18 @@ export function Section({ id, className = "", children, label, bg, backdrop }) {
   );
 }
 
+// A small "next step" at the end of a story chapter.
+export function Chapter({ n, text, href, cta }) {
+  return (
+    <div className="dr-chapter k-reveal">
+      <span className="dr-chapter__n">{n}</span>
+      <p>{text}</p>
+      <a href={href} className="dr-chapter__cta">
+        {cta} <span className="k-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  );
+}
+
 // stagger by line, never by letter
 export const delay = (i, step = 90) => ({ "--d": `${i * step}ms` });

@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Services Catalog — [ Your Agency Name ]</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap');
+
+        :root {
+            --wa-green: #25D366;
+            --wa-dark: #075E54;
+            --wa-light: #DCF8C6;
+            --wa-bg: #ECE5DD;
+            --wa-chat-bg: #E5DDD5;
+            --primary: #D4451A;
+            --accent: #F59E0B;
+            --gold: #D4A017;
+            --dark: #1A1A2E;
+            --gray-900: #111827;
+            --gray-700: #374151;
+            --gray-500: #6B7280;
+            --gray-300: #D1D5DB;
+            --gray-100: #F3F4F6;
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            .phone-frame { box-shadow: none; border: 2px solid #ccc; }
+        }
+
+        /* PRINT/SHARE BAR */
+        .top-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: var(--wa-dark);
+            color: var(--white);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+        }
+        .top-bar span { font-weight: 600; }
+        .top-bar-btns { display: flex; gap: 10px; }
+        .top-btn {
+            background: var(--wa-green); color: var(--white); border: none;
+            padding: 8px 20px; border-radius: 8px; font-weight: 700;
+            cursor: pointer; font-size: 13px;
+        }
+        .top-btn.secondary { background: rgba(255,255,255,0.15); }
+        @media screen { body { padding-top: 50px; } }
+        @media print { .top-bar { display: none; } body { padding-top: 0; } }
+
+        /* ---- LAYOUT ---- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero .emoji { font-size: 50px; margin-bottom: 15px; }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .hero h1 span { color: var(--primary); }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--gray-500);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ---- CATALOG CARDS ---- */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .catalog-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .catalog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .card-banner {
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .card-banner.meta { background: linear-gradient(135deg, #1877F2, #0D47A1); }
+        .card-banner.google { background: linear-gradient(135deg, #EA4335, #B71C1C); }
+        .card-banner.whatsapp { background: linear-gradient(135deg, var(--wa-green), var(--wa-dark)); }
+        .card-banner.creative { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+        .card-banner.seo { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .card-banner.full { background: linear-gradient(135deg, var(--primary), #B91C1C); }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+        }
+
+        .card-service-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--white);
+        }
+
+        .card-tagline {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 3px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .card-features li {
+            font-size: 13px;
+            color: var(--gray-700);
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-features li .check {
+            color: var(--wa-green);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .card-pricing {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .card-price {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .card-price .from {
+            font-size: 11px;
+            color: var(--gray-500);
+            font-weight: 400;
+        }
+
+        .card-price .period {
+            font-size: 12px;
+            color: var(--gray-500);
+            font-weight: 400;
+        }
+
+        .card-cta {
+            background: var(--wa-green);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ---- DIWALI SPECIAL BANNER ---- */
+        .diwali-banner {
+            background: linear-gradient(135deg, #1A1A2E, #0F3460);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: var(--white);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diwali-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 70%, rgba(245,158,11,0.1) 0%, transparent 50%);
+        }
+
+        .diwali-banner h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .diwali-banner p {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .diwali-offers {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .diwali-offer {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* ---- RESULTS ROW ---- */
+        .results-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .result-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .result-number {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .result-label {
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* ---- COMBO PACKAGES ---- */
+        .combo-section {
+            margin-bottom: 40px;
+        }
+
+        .combo-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .combo-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 25px;
+        }
+
+        .combo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .combo-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px 25px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .combo-card.featured {
+            border: 3px solid var(--primary);
+            background: linear-gradient(180deg, #FFF5F2, var(--white));
+        }
+
+        .combo-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 18px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .combo-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 10px 0 5px;
+        }
+
+        .combo-includes {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 15px;
+        }
+
+        .combo-price {
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .combo-price .old {
+            font-size: 16px;
+            color: var(--gray-300);
+            text-decoration: line-through;
+            font-weight: 400;
+        }
+
+        .combo-price .period {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 400;
+        }
+
+        .combo-savings {
+            display: inline-block;
+            background: #D1FAE5;
+            color: #059669;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .combo-features {
+            list-style: none;
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .combo-features li {
+            font-size: 12px;
+            color: var(--gray-700);
+            padding: 4px 0;
+        }
+
+        .combo-features li::before {
+            content: '✅ ';
+            font-size: 11px;
+        }
+
+        /* ---- CONTACT / CTA ---- */
+        .contact-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+
+        .contact-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .contact-section p {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 25px;
+        }
+
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .contact-btn:hover { transform: translateY(-2px); }
+
+        .contact-btn.wa {
+            background: var(--wa-green);
+            color: var(--white);
+        }
+
+        .contact-btn.call {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .contact-btn.email {
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .contact-info {
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--gray-700);
+            line-height: 2;
+        }
+
+        /* ---- SHAREABLE WA IMAGE CARDS ---- */
+        .wa-share-section {
+            margin-bottom: 40px;
+        }
+
+        .wa-share-title {
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .wa-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .wa-card {
+            background: linear-gradient(135deg, var(--dark), #16213E);
+            border-radius: 16px;
+            padding: 30px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wa-card::before {
+            content: '🪔';
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            opacity: 0.3;
+        }
+
+        .wa-card h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .wa-card h3 span { color: var(--accent); }
+
+        .wa-card p {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .wa-card .wa-highlight {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .wa-card .wa-footer {
+            margin-top: 15px;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        /* COPY-PASTE MESSAGES */
+        .msg-section {
+            margin-bottom: 40px;
+        }
+
+        .msg-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--dark);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .msg-subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 25px;
+        }
+
+        .msg-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .msg-box {
+            background: var(--wa-chat-bg);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .msg-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--wa-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .msg-bubble {
+            background: var(--wa-light);
+            border-radius: 0 12px 12px 12px;
+            padding: 15px 18px;
+            font-size: 14px;
+            color: var(--dark);
+            line-height: 1.7;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .msg-bubble .time {
+            text-align: right;
+            font-size: 10px;
+            color: var(--gray-500);
+            margin-top: 5px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--wa-dark);
+            color: var(--white);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover { background: var(--wa-green); }
+
+        /* FOOTER */
+        .page-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-500);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <div class="top-bar no-print">
+        <span>💬 WhatsApp Services Catalog</span>
+        <div class="top-bar-btns">
+            <button class="top-btn" onclick="window.print()">📄 Save as PDF</button>
+            <button class="top-btn secondary" onclick="alert('Take screenshots of individual cards to share on WhatsApp!')">📸 Share Guide</button>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- ======== HERO ======== -->
+        <div class="hero">
+            <div class="emoji">🪔</div>
+            <h1>Diwali 2026 <span>Ad Services</span></h1>
+            <p>Grow your business this festive season with targeted digital advertising. Share this catalog with potential clients on WhatsApp.</p>
+        </div>
+
+        <!-- ======== RESULTS ROW ======== -->
+        <div class="results-row">
+            <div class="result-card">
+                <div class="result-number">70%</div>
+                <div class="result-label">Sales from Ads</div>
+            </div>
+            <div class="result-card">
+                <div class="result-number">3-5x</div>
+                <div class="result-label">Return on Ad Spend</div>
+            </div>
+            <div class="result-card">
+                <div class="result-number">10K+</div>
+                <div class="result-label">Leads Generated</div>
+            </div>
+            <div class="result-card">
+                <div class="result-number">50+</div>
+                <div class="result-label">Happy Clients</div>
+            </div>
+        </div>
+
+        <!-- ======== SERVICE CATALOG CARDS ======== -->
+        <div class="catalog-grid">
+
+            <!-- META ADS -->
+            <div class="catalog-card">
+                <div class="card-banner meta">
+                    <div class="card-icon">📘</div>
+                    <div class="card-service-name">Meta Ads</div>
+                    <div class="card-tagline">Facebook + Instagram Advertising</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-desc">
+                        Reach thousands of potential customers in your city through Facebook & Instagram. Show your Diwali offers to people who are most likely to buy.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="check">✓</span> Audience targeting (age, location, interest)</li>
+                        <li><span class="check">✓</span> Festive ad creative design</li>
+                        <li><span class="check">✓</span> Carousel, Reel & Story ads</li>
+                        <li><span class="check">✓</span> Retargeting past visitors</li>
+                        <li><span class="check">✓</span> Lead generation campaigns</li>
+                        <li><span class="check">✓</span> Weekly performance reports</li>
+                    </ul>
+                    <div class="card-pricing">
+                        <div class="card-price">
+                            <span class="from">From</span> ₹10,000
+                            <span class="period">/mo</span>
+                        </div>
+                        <button class="card-cta">💬 Enquire</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GOOGLE ADS -->
+            <div class="catalog-card">
+                <div class="card-banner google">
+                    <div class="card-icon">🔍</div>
+                    <div class="card-service-name">Google Ads</div>
+                    <div class="card-tagline">Search, Shopping & Maps Advertising</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-desc">
+                        Appear #1 on Google when someone searches "saree shop Surat" or "jewellery near me". Capture customers with high purchase intent.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="check">✓</span> Google Search campaigns</li>
+                        <li><span class="check">✓</span> Google Shopping (ecommerce)</li>
+                        <li><span class="check">✓</span> Google Maps / local ads</li>
+                        <li><span class="check">✓</span> Keyword research & bidding</li>
+                        <li><span class="check">✓</span> Conversion tracking setup</li>
+                        <li><span class="check">✓</span> Monthly optimization</li>
+                    </ul>
+                    <div class="card-pricing">
+                        <div class="card-price">
+                            <span class="from">From</span> ₹12,000
+                            <span class="period">/mo</span>
+                        </div>
+                        <button class="card-cta">💬 Enquire</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHATSAPP MARKETING -->
+            <div class="catalog-card">
+                <div class="card-banner whatsapp">
+                    <div class="card-icon">💬</div>
+                    <div class="card-service-name">WhatsApp Marketing</div>
+                    <div class="card-tagline">Broadcast, Catalog & Auto-Reply</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-desc">
+                        Send Diwali offers directly to your customers' WhatsApp. 98% open rate vs 20% for emails. Re-engage your existing database instantly.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="check">✓</span> WhatsApp Business API setup</li>
+                        <li><span class="check">✓</span> Broadcast campaign design</li>
+                        <li><span class="check">✓</span> Digital catalog creation</li>
+                        <li><span class="check">✓</span> Auto-reply chatbot</li>
+                        <li><span class="check">✓</span> Customer segmentation</li>
+                        <li><span class="check">✓</span> Festive offer templates</li>
+                    </ul>
+                    <div class="card-pricing">
+                        <div class="card-price">
+                            <span class="from">From</span> ₹8,000
+                            <span class="period">/mo</span>
+                        </div>
+                        <button class="card-cta">💬 Enquire</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CREATIVE DESIGN -->
+            <div class="catalog-card">
+                <div class="card-banner creative">
+                    <div class="card-icon">🎨</div>
+                    <div class="card-service-name">Creative Design</div>
+                    <div class="card-tagline">Festive Graphics, Reels & Stories</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-desc">
+                        Stunning Diwali-themed visuals that stop the scroll. Professional posters, Instagram Reels, and Stories that match your brand identity.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="check">✓</span> Diwali poster & banner design</li>
+                        <li><span class="check">✓</span> Instagram Reels (video)</li>
+                        <li><span class="check">✓</span> Story templates</li>
+                        <li><span class="check">✓</span> Product showcase graphics</li>
+                        <li><span class="check">✓</span> WhatsApp status designs</li>
+                        <li><span class="check">✓</span> Brand-consistent design</li>
+                    </ul>
+                    <div class="card-pricing">
+                        <div class="card-price">
+                            <span class="from">From</span> ₹5,000
+                            <span class="period">/mo</span>
+                        </div>
+                        <button class="card-cta">💬 Enquire</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOCIAL MEDIA MGMT -->
+            <div class="catalog-card">
+                <div class="card-banner seo">
+                    <div class="card-icon">📱</div>
+                    <div class="card-service-name">Social Media Management</div>
+                    <div class="card-tagline">Instagram & Facebook Daily Posts</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-desc">
+                        We handle your entire social media — from Diwali content planning to daily posts, stories, and engagement. You focus on sales, we handle online presence.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="check">✓</span> Content calendar planning</li>
+                        <li><span class="check">✓</span> 15-30 posts per month</li>
+                        <li><span class="check">✓</span> Hashtag strategy</li>
+                        <li><span class="check">✓</span> Comment & DM management</li>
+                        <li><span class="check">✓</span> Festive theme content</li>
+                        <li><span class="check">✓</span> Monthly analytics report</li>
+                    </ul>
+                    <div class="card-pricing">
+                        <div class="card-price">
+                            <span class="from">From</span> ₹10,000
+                            <span class="period">/mo</span>
+                        </div>
+                        <button class="card-cta">💬 Enquire</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FULL DIGITAL -->
+            <div class="catalog-card">
+                <div class="card-banner full">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-service-name">Full Diwali Package</div>
+                    <div class="card-tagline">Everything You Need in One Plan</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-desc">
+                        The complete 360° Diwali marketing solution. Meta Ads + Google Ads + WhatsApp + Creatives + Social Media — all managed by one team.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="check">✓</span> Everything in all services above</li>
+                        <li><span class="check">✓</span> Dedicated account manager</li>
+                        <li><span class="check">✓</span> Influencer collaboration</li>
+                        <li><span class="check">✓</span> Landing page creation</li>
+                        <li><span class="check">✓</span> Weekly strategy calls</li>
+                        <li><span class="check">✓</span> Priority support</li>
+                    </ul>
+                    <div class="card-pricing">
+                        <div class="card-price">
+                            <span class="from">From</span> ₹35,000
+                            <span class="period">/mo</span>
+                        </div>
+                        <button class="card-cta">💬 Enquire</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======== DIWALI SPECIAL ======== -->
+        <div class="diwali-banner">
+            <h2>🪔 Diwali Early Bird Offer 🪔</h2>
+            <p>Sign up before [ Date ] and get these FREE bonuses worth ₹15,000+</p>
+            <div class="diwali-offers">
+                <div class="diwali-offer">🎁 Free Competitor Analysis</div>
+                <div class="diwali-offer">📸 2 Bonus Creatives</div>
+                <div class="diwali-offer">💬 Free WhatsApp Setup</div>
+                <div class="diwali-offer">🌐 Free Landing Page</div>
+            </div>
+        </div>
+
+        <!-- ======== COMBO PACKAGES ======== -->
+        <div class="combo-section">
+            <div class="combo-title">🎁 Bundle & Save</div>
+            <div class="combo-subtitle">Combine services for the best value this Diwali</div>
+
+            <div class="combo-grid">
+                <div class="combo-card">
+                    <div class="combo-name">🌱 Starter</div>
+                    <div class="combo-includes">Meta Ads + 5 Creatives</div>
+                    <div class="combo-price">
+                        <span class="old">₹18,000</span><br>
+                        ₹15,000 <span class="period">/mo</span>
+                    </div>
+                    <div class="combo-savings">Save ₹3,000</div>
+                    <ul class="combo-features">
+                        <li>Facebook + Instagram Ads</li>
+                        <li>5 festive creatives</li>
+                        <li>Monthly report</li>
+                        <li>WhatsApp support</li>
+                    </ul>
+                </div>
+
+                <div class="combo-card featured">
+                    <div class="combo-badge">🔥 Best Value</div>
+                    <div class="combo-name">🚀 Growth</div>
+                    <div class="combo-includes">Meta + Google + WhatsApp + 10 Creatives</div>
+                    <div class="combo-price">
+                        <span class="old">₹40,000</span><br>
+                        ₹30,000 <span class="period">/mo</span>
+                    </div>
+                    <div class="combo-savings">Save ₹10,000</div>
+                    <ul class="combo-features">
+                        <li>Meta Ads + Google Ads</li>
+                        <li>WhatsApp broadcast</li>
+                        <li>10 creatives + 2 Reels</li>
+                        <li>Bi-weekly reports</li>
+                        <li>Dedicated manager</li>
+                    </ul>
+                </div>
+
+                <div class="combo-card">
+                    <div class="combo-name">👑 Premium</div>
+                    <div class="combo-includes">All Services + Priority</div>
+                    <div class="combo-price">
+                        <span class="old">₹75,000</span><br>
+                        ₹60,000 <span class="period">/mo</span>
+                    </div>
+                    <div class="combo-savings">Save ₹15,000</div>
+                    <ul class="combo-features">
+                        <li>All 6 services included</li>
+                        <li>20 creatives + 4 Reels</li>
+                        <li>Influencer collab</li>
+                        <li>Landing page</li>
+                        <li>Weekly calls + reports</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======== COPY-PASTE WA MESSAGES ======== -->
+        <div class="msg-section">
+            <div class="msg-title">📋 Ready-to-Send WhatsApp Messages</div>
+            <div class="msg-subtitle">Copy these messages and forward to potential clients</div>
+
+            <div class="msg-container">
+                <div class="msg-box">
+                    <div class="msg-label">🎯 First Touch — Introduction</div>
+                    <button class="copy-btn no-print" onclick="copyMsg(this)">📋 Copy</button>
+                    <div class="msg-bubble" id="msg1">
+                        🪔 *Namaskar!*
+
+Mein [Your Name], *[Agency Name]* se bol raha hoon.
+
+Aapka brand Diwali mein *3x zyada* customers tak pahunch sakta hai — agar sahi ads chalaye jayein.
+
+Hum specifically *Diwali campaigns* chalate hain:
+✅ Facebook & Instagram Ads
+✅ Google Ads
+✅ WhatsApp Marketing
+✅ Festive Creatives
+
+🎁 *FREE Diwali Strategy Session* — sirf 15 min
+
+Interested? Reply karein ya call karein:
+📞 [Your Phone]
+
+_Limited slots available_ ⏰
+                        <div class="time">✓✓ 10:30 AM</div>
+                    </div>
+                </div>
+
+                <div class="msg-box">
+                    <div class="msg-label">🔄 Follow-Up — Urgency</div>
+                    <button class="copy-btn no-print" onclick="copyMsg(this)">📋 Copy</button>
+                    <div class="msg-bubble" id="msg2">
+                        Hi [Name] ji! 🙏
+
+Quick update — humari *Diwali campaign slots bhar rahi hain*.
+
+Aapke city mein sirf *[X] slots* bache hain.
+
+Jo businesses abhi start kar rahe hain, unki Diwali sales *3-5x zyada* hoti hai compared to those who start late.
+
+Aapke competitors already shuru ho gaye hain... 👀
+
+📞 *Abhi free strategy call book karein:* [Your Phone]
+
+Ya simply *"YES"* reply karein! 🎯
+                        <div class="time">✓✓ 2:15 PM</div>
+                    </div>
+                </div>
+
+                <div class="msg-box">
+                    <div class="msg-label">💼 Services Overview — Send as Catalog</div>
+                    <button class="copy-btn no-print" onclick="copyMsg(this)">📋 Copy</button>
+                    <div class="msg-bubble" id="msg3">
+                        🪔 *[Agency Name] — Diwali 2026 Services* 🪔
+
+📘 *Meta Ads* — ₹10K/mo onwards
+Facebook + Instagram targeting
+
+🔍 *Google Ads* — ₹12K/mo onwards
+Search, Shopping & Maps
+
+💬 *WhatsApp Marketing* — ₹8K/mo onwards
+Broadcast + Catalog + Auto-reply
+
+🎨 *Creative Design* — ₹5K/mo onwards
+Posters, Reels, Stories
+
+📱 *Social Media* — ₹10K/mo onwards
+Daily posts + management
+
+🚀 *Full Package* — ₹35K/mo onwards
+Everything included!
+
+🎁 *Early Bird Bonus:* Sign up this week & get FREE competitor analysis + 2 bonus creatives!
+
+📞 Call: [Phone]
+🌐 Website: [URL]
+
+_Share this with any business owner who wants more Diwali sales!_ 📤
+                        <div class="time">✓✓ 11:00 AM</div>
+                    </div>
+                </div>
+
+                <div class="msg-box">
+                    <div class="msg-label">📊 Social Proof — Results Message</div>
+                    <button class="copy-btn no-print" onclick="copyMsg(this)">📋 Copy</button>
+                    <div class="msg-bubble" id="msg4">
+                        *Real Results from Our Diwali Campaigns* 📈
+
+🏪 [Business Type] in [City]
+💰 Ad Spend: ₹[X]
+📈 Revenue: ₹[X]
+🔄 *Return: [X]x*
+
+🏪 [Business Type] in [City]
+💰 Ad Spend: ₹[X]
+📈 Revenue: ₹[X]
+🔄 *Return: [X]x*
+
+Yeh results *aapke business ke liye bhi possible hain*.
+
+📞 *Free 15-min strategy call:*
+[Your Phone]
+
+No commitment. No pressure.
+Sirf value. 🙏
+                        <div class="time">✓✓ 4:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======== CONTACT CTA ======== -->
+        <div class="contact-section">
+            <h2>🪔 Ready to Grow This Diwali?</h2>
+            <p>Get in touch for a free, no-obligation strategy session</p>
+            <div class="contact-methods">
+                <a href="#" class="contact-btn wa">💬 WhatsApp Us</a>
+                <a href="#" class="contact-btn call">📞 Call Now</a>
+                <a href="#" class="contact-btn email">📧 Email Us</a>
+            </div>
+            <div class="contact-info">
+                <strong>[ Your Name ]</strong> — [ Your Agency Name ]<br>
+                📞 [ Your Phone ] &nbsp;|&nbsp; 📧 [ Your Email ]<br>
+                🌐 [ Your Website ] &nbsp;|&nbsp; 📍 [ City ], Gujarat
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="page-footer">
+        <p><strong>[ Your Agency Name ]</strong> — Diwali 2026 Services Catalog</p>
+        <p>Share this page with business owners on WhatsApp | Save as PDF: Ctrl+P</p>
+    </div>
+
+    <script>
+        function copyMsg(btn) {
+            const msgBox = btn.parentElement;
+            const bubble = msgBox.querySelector('.msg-bubble');
+            const text = bubble.innerText.replace(/\n✓✓.*$/, '').trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+            });
+        }
+    </script>
+
+</body>
+</html>

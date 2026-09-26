@@ -10,11 +10,39 @@ export const contact = {
 };
 
 export const hero = {
-  eyebrow: "Kapadiya & Sons · Surat",
-  title: ["Every saree in the shop,", "on your customer.", "No packet opened."],
-  sub: "A smart mirror and the software behind it, made for clothing shops and showrooms. Customers stand in front of it, pick from your catalogue and see the garment on their own body in seconds. Trial rooms stay free and they see more of your stock.",
-  primary: { label: "Try it on yourself", href: "/mirror" },
-  secondary: { label: "Book a demo in your shop", href: "#contact" },
+  eyebrow: "The AI Dressing Room · by Smit Kapadiya",
+  title: ["Step into the mirror.", "Walk out in anything."],
+  sub: "Every outfit, on you, in seconds. Kapadiya & Sons builds an AI dressing room for clothing shops and showrooms. Your customer stands in front of the mirror, taps a saree, a lehenga or a sherwani from your catalogue, and sees it on their own body. No packet opened, no queue, just that small “oh, that’s me” smile.",
+  primary: { label: "Step into the dressing room", href: "/mirror" },
+  secondary: { label: "Bring it to my shop", href: "#contact" },
+  proof: ["Seconds per look", "Your own catalogue", "Only the clothes change"],
+};
+
+// The interactive studio right under the hero. Looks come from public/looks.
+export const studio = {
+  eyebrow: "Try the room",
+  title: "Tap a look. Drag the seam. Watch the smile arrive.",
+  body: "This is the moment your customer feels at the mirror. Same face, same body, same skin, in the outfit they came in dreaming about.",
+  hint: "Drag across the photo to compare.",
+  cta: "Try it with your own photo",
+  looks: [
+    { src: "/looks/look-crimson.jpg", name: "Crimson festive silk", short: "Crimson", cheer: "Made for the wedding season." },
+    { src: "/looks/look-emerald.jpg", name: "Emerald evening drape", short: "Emerald", cheer: "That colour loves you." },
+    { src: "/looks/look-ivory.jpg", name: "Ivory & gold classic", short: "Ivory", cheer: "Timeless, and so you." },
+    { src: "/looks/look-midnight.jpg", name: "Midnight statement", short: "Midnight", cheer: "Every head turns." },
+  ],
+};
+
+// Mini calls-to-action between story chapters.
+export const chapters = [
+  { n: "I", text: "Every one of those problems ends at the mirror.", href: "#studio", cta: "See it happen" },
+  { n: "II", text: "Your face. Your body. Just a new outfit.", href: "/mirror", cta: "Try it on yourself" },
+  { n: "III", text: "Ready to see it on your own shop floor?", href: "#contact", cta: "Book a free demo" },
+];
+
+export const rack = {
+  eyebrow: "The rack never ends",
+  title: "Hundreds of designs. Zero folding.",
 };
 
 export const problem = {
@@ -147,9 +175,9 @@ export const faq = {
 };
 
 export const closing = {
-  title: ["Let them see it on themselves.", "Then let them decide."],
+  title: ["Let them see it on themselves.", "Then watch them smile."],
   cta: { label: "Book a demo in your shop", href: "#contact" },
   formIntro: "Tell us about your shop. We'll bring the mirror to you and run it on your own garments.",
   signoff: "Silk is patient. So is a tailor.",
-  credit: "Designed & built by Smit Kapadiya",
+  credit: "The AI Dressing Room · designed & built by Smit Kapadiya, Kapadiya & Sons",
 };

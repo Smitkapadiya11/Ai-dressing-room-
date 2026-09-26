@@ -1,4 +1,7 @@
-import { hero, problem, origin, founder } from "@/content/home";
+import fs from "node:fs";
+import path from "node:path";
+import { hero, problem, origin, founder, studio, rack } from "@/content/home";
+import { HeroMirror, Studio } from "./DressingRoom";
 import { clean } from "@/content/clean";
 import { Btn, Head, Label, Section, delay } from "./ui";
 import { MEDIA } from "@/lib/media";
@@ -10,13 +13,15 @@ export function Nav() {
       <nav className="k-wrap k-nav__in" aria-label="Main">
         <a href="/" className="k-mark">
           Kapadiya <span>&amp;</span> Sons
+          <small className="dr-mark-sub">AI Dressing Room</small>
         </a>
         <div className="k-nav__links">
+          <a href="#studio">Try a look</a>
           <a href="#how">How it works</a>
           <a href="#promise">Our promise</a>
           <a href="#plans">Plans</a>
           <a href="#faq">FAQ</a>
-          <Btn href="/mirror">Try it on</Btn>
+          <Btn href="/mirror">Step in</Btn>
         </div>
       </nav>
     </header>
@@ -32,6 +37,7 @@ export function Hero() {
           {MEDIA.heroPortrait && <Clip src={MEDIA.heroPortrait} className="k-only-narrow" concept />}
         </div>
       )}
+      <div className="dr-aurora" aria-hidden="true"><i /><i /><i /></div>
       <div className="k-wrap k-grid">
         <div className="k-hero__copy">
           <div className="k-reveal">
@@ -53,18 +59,17 @@ export function Hero() {
               {hero.secondary.label}
             </Btn>
           </div>
+          <ul className="dr-proof k-reveal" style={delay(6)}>
+            {hero.proof.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
         </div>
-        {!MEDIA.hero && <div className="k-hero__visual k-reveal" style={delay(3)}>
-          {/* Code-native stand-in until /media/hero-loop.mp4 exists: the garment drapes down over the capture. */}
-          <div className="k-mirror" role="img" aria-label="A customer in the mirror, then the same customer wearing a new outfit">
-            <div className="k-mirror__glass">
-              <img src="/looks/mirror-feed.jpg" alt="" fetchPriority="high" />
-              <img src="/looks/look-crimson.jpg" alt="" className="k-mirror__after" />
-              <div className="k-mirror__seam" />
-            </div>
-            <span className="k-mirror__tag">Before · After</span>
+        {!MEDIA.hero && (
+          <div className="k-hero__visual k-reveal" style={delay(3)}>
+            <HeroMirror />
           </div>
-        </div>}
+        )}
       </div>
     </section>
   );
@@ -147,5 +152,58 @@ export function Founder() {
         </div>
       </div>
     </Section>
+  );
+}
+
+export function StudioSection() {
+  return (
+    <section id="studio" aria-label="Try the dressing room" className="k-section dr-studio-sec">
+      <div className="k-wrap">
+        <div className="k-head k-reveal dr-center">
+          <Label>{studio.eyebrow}</Label>
+          <h2 className="k-h2">{studio.title}</h2>
+          <p className="k-lead">{studio.body}</p>
+        </div>
+        <div className="k-reveal">
+          <Studio />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Every garment photo in public/catalogue, drifting past like a rail in a showroom.
+const RACK = (() => {
+  try {
+    return fs.readdirSync(path.join(process.cwd(), "public/catalogue")).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
+  } catch {
+    return [];
+  }
+})();
+
+export function Rack() {
+  if (RACK.length < 4) return null;
+  const half = Math.ceil(RACK.length / 2);
+  const rows = [RACK.slice(0, half), RACK.slice(half)];
+  const name = (f) => f.replace(/\.\w+$/, "").replace(/-/g, " ");
+  return (
+    <section aria-label={rack.title} className="dr-rack">
+      <div className="k-wrap k-head k-reveal dr-center">
+        <Label>{rack.eyebrow}</Label>
+        <h2 className="k-h2">{rack.title}</h2>
+      </div>
+      {rows.map((row, r) => (
+        <div key={r} className={`dr-rack__row ${r ? "is-rev" : ""}`} aria-hidden="true">
+          <div className="dr-rack__track">
+            {[...row, ...row].map((f, i) => (
+              <figure key={i} className="dr-hanger">
+                <img src={`/catalogue/${f}`} alt="" loading="lazy" />
+                <figcaption>{name(f)}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }

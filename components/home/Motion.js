@@ -28,6 +28,8 @@ export default function Motion() {
     const tick = () => {
       raf = 0;
       nav?.classList.toggle("is-solid", window.scrollY > 24);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      document.documentElement.style.setProperty("--scroll", max > 0 ? (window.scrollY / max).toFixed(4) : "0");
       if (thread && !reduce) {
         const r = thread.getBoundingClientRect();
         const p = Math.min(1, Math.max(0, (window.innerHeight * 0.7 - r.top) / r.height));
@@ -38,10 +40,20 @@ export default function Motion() {
       if (!raf) raf = requestAnimationFrame(tick);
     };
     tick();
+    // Cards light up under the finger / cursor.
+    const onMove = (e) => {
+      const card = e.target.closest?.(".k-feat__item, .k-reason, .k-tier, .k-step");
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       io?.disconnect();
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
     };
   }, []);

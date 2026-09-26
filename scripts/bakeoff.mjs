@@ -12,6 +12,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import * as openai from "../lib/providers/openai.js";
 import * as gemini from "../lib/providers/gemini.js";
+import * as qwen from "../lib/providers/qwen.js";
 
 const HELP = `
 The bakeoff — run one photo through both providers, look at your own face.
@@ -78,9 +79,10 @@ async function main() {
   await Promise.all([
     run("openai", openai, Boolean(process.env.OPENAI_API_KEY)),
     run("gemini", gemini, Boolean(process.env.GEMINI_API_KEY)),
+    run("qwen", qwen, Boolean(process.env.QWEN_API_URL || true)),
   ]);
   console.log(
-    "\nLook at bakeoff/openai.jpg and bakeoff/gemini.jpg yourself — your own face settles it better than any published benchmark. Set PROVIDER to whichever wins in .env.local."
+    "\nLook at bakeoff/*.jpg yourself — your own face settles it better than any published benchmark. Set PROVIDER to whichever wins in .env.local."
   );
 }
 

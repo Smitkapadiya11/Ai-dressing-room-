@@ -1,17 +1,20 @@
 import { redirect } from "next/navigation";
 import "@/styles/tokens.css";
 import "@/styles/home.css";
+import "@/styles/dressing-room.css";
 import { SITE_URL } from "@/lib/site";
 import { MEDIA } from "@/lib/media";
 import { contact } from "@/content/home";
 import Motion from "@/components/home/Motion";
-import { Nav, Hero, Problem, Origin, Founder } from "@/components/home/Top";
+import { Nav, Hero, StudioSection, Rack, Problem, Origin, Founder } from "@/components/home/Top";
 import { Steps, Features, Honesty, System, Reasons, Plans, Faq, Closing } from "@/components/home/Bottom";
+import { Chapter } from "@/components/home/ui";
+import { chapters } from "@/content/home";
 
 export const metadata = {
-  title: "Kapadiya & Sons — A try-on mirror for Indian clothing shops",
+  title: "The AI Dressing Room by Smit Kapadiya — Kapadiya & Sons",
   description:
-    "A smart mirror and software for clothing retailers and showrooms. Customers see your sarees, lehengas and kurtas on their own body in seconds. Made in Surat.",
+    "An AI dressing room for clothing shops and showrooms. Customers see your sarees, lehengas and sherwanis on their own body in seconds. Built by Smit Kapadiya, Kapadiya & Sons, Surat.",
   metadataBase: new URL(SITE_URL),
   alternates: { canonical: "/" },
   openGraph: { type: "website", siteName: "Kapadiya & Sons", locale: "en_IN", url: "/" },
@@ -47,17 +50,23 @@ export default function Home() {
     <div className={`k-page ${MEDIA.grain ? "k-page--grain" : ""}`} style={MEDIA.grain ? { "--grain": `url(${MEDIA.grain})` } : undefined}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <Motion />
+      <div className="dr-progress" aria-hidden="true" />
       <Nav />
       <main>
         <Hero />
+        <StudioSection />
+        <Rack />
         <Problem />
+        <Chapter {...chapters[0]} />
         <Origin />
         <Founder />
         <Steps />
         <Features />
         <Honesty />
+        <Chapter {...chapters[1]} />
         <System />
         <Reasons />
+        <Chapter {...chapters[2]} />
         <Plans />
         <Faq />
         <Closing />
