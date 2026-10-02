@@ -10,41 +10,48 @@ import Icon from "./Icon";
 const FEATURE_ICONS = ["hanger", "spark", "qr", "mirror", "play"];
 const REASON_ICONS = ["eye", "clock", "heart", "crown", "wallet", "phone"];
 
-// Code-native loops for the three steps, until step-*.mp4 exist.
-const STEP_VISUALS = [
-  <>
-    <div className="v-figure" />
-    <div className="v-scan" />
-  </>,
-  <div className="v-rail">
-    <span />
-    <span />
-    <span />
-    <span />
-  </div>,
-  <>
-    <div className="v-figure" />
-    <div className="v-drape" />
-  </>,
-];
-
 export function Steps() {
+  const { coda, head } = steps;
   return (
-    <Section id="how" label="How it works">
-      <Head eyebrow={steps.eyebrow} title={steps.title} />
-      <ol className="k-steps" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+    <Section id="how" label="How it works" className="k-how">
+      <div className="k-how__head">
+        <Head eyebrow={steps.eyebrow} title={steps.title} />
+        <figure className="k-how__polaroid k-reveal" style={delay(2)}>
+          <img src={head.img} alt={head.alt} loading="lazy" />
+        </figure>
+      </div>
+      <ol className="k-how__list">
         {steps.items.map((s, i) => (
-          <li key={s.n} className={`k-step k-reveal ${s.honest ? "k-step--honest" : ""}`} style={delay(i, 140)}>
-            <div className="k-step__vis" aria-hidden="true">
-              {MEDIA.steps[i] ? <Clip src={MEDIA.steps[i]} concept={i === 2} /> : STEP_VISUALS[i]}
+          <li key={s.n} className={`k-how__step k-how__step--${i + 1}`}>
+            <div className="k-how__vis k-reveal">
+              <div className="k-how__frame">
+                <img src={s.img} alt={s.alt} loading="lazy" />
+              </div>
+              <span className="k-how__tag">{s.tag}</span>
+              {s.loupe && (
+                <span className="k-how__loupe">
+                  <img src={s.loupe} alt="" loading="lazy" />
+                  <em>Every zari thread, kept</em>
+                </span>
+              )}
             </div>
-            <span className="k-step__n">{s.n}</span>
-            <h3 className="k-h3">{s.title}</h3>
-            <p>{s.body}</p>
-            {s.honest && <a href="#promise" className="k-step__flag">Only the clothes change →</a>}
+            <div className="k-how__copy k-reveal" style={delay(1, 140)}>
+              <span className="k-how__n" aria-hidden="true">{s.n}</span>
+              <h3 className="k-h2">{s.title}</h3>
+              <p className="k-lead">{s.body}</p>
+              {s.honest && <a href="#promise" className="k-step__flag">Only the clothes change →</a>}
+            </div>
           </li>
         ))}
       </ol>
+      <div className="k-how__coda k-reveal">
+        <img src={coda.img} alt={coda.alt} loading="lazy" />
+        <div className="k-how__codacopy">
+          <Label>{coda.eyebrow}</Label>
+          <h3 className="k-h2">{coda.title}</h3>
+          <p>{coda.body}</p>
+        </div>
+      </div>
     </Section>
   );
 }

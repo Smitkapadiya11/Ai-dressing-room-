@@ -110,10 +110,18 @@ export const steps = {
   eyebrow: "How it works",
   title: "Three steps. About as long as it takes to unfold one saree.",
   items: [
-    { n: "1", title: "Stand in front of the mirror.", body: "The camera takes your picture in a few seconds." },
-    { n: "2", title: "Pick from the catalogue.", body: "Swipe through the shop's own garments: sarees, lehengas, kurtas, shirts." },
-    { n: "3", title: "See it on you.", body: "Your body, your skin, your shape, wearing that garment. Scan the QR and the look goes home on your phone.", honest: true },
+    { n: "01", title: "Stand in front of the mirror.", body: "The camera takes your picture in a few seconds. No changing room, no undressing, no queue.", tag: "Your photo", img: "/media/home/how-1-photo.jpg", alt: "A customer in everyday clothes taking her picture at the mirror" },
+    { n: "02", title: "Pick from the catalogue.", body: "Swipe through the shop's own garments: sarees, lehengas, kurtas, shirts. Every piece in stock, one tap away.", tag: "Your stock, not a stock library", img: "/media/home/how-2-catalogue.jpg", alt: "Six lehengas from a shop catalogue, each with a Try On button" },
+    { n: "03", title: "See it on you.", body: "Your body, your skin, your shape, wearing that garment. Scan the QR and the look goes home on your phone.", tag: "Only the clothes change", img: "/media/home/how-3-result.jpg", alt: "The same customer seen wearing a pink floral lehenga on the phone result", loupe: "/media/home/how-3-loupe.jpg", honest: true },
   ],
+  coda: {
+    eyebrow: "Beyond the mirror",
+    title: "The same fitting, on your website.",
+    body: "One “Try on with AI” button on every product page. Customers try the lehenga from their sofa, then walk into your shop already sure.",
+    img: "/media/home/how-4-website.jpg",
+    alt: "A customer at home trying a lehenga on a shop's product page",
+  },
+  head: { img: "/media/home/how-head.jpg", alt: "Her photo beside the instant try-on result" },
 };
 
 export const features = {
