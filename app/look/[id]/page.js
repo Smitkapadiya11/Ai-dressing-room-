@@ -2,6 +2,7 @@ import { readLook } from "@/lib/store";
 import { Monogram } from "@/components/Brand";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Your look — Kapadiya & Sons", robots: { index: false, follow: false } };
 
 export default async function LookPage({ params }) {
   const { id } = await params;
@@ -26,7 +27,7 @@ export default async function LookPage({ params }) {
           is what keeps this fast on shop wifi. */}
       <img
         src={url}
-        alt="Your look at Kapadiya &amp; Sons"
+        alt="Your look at Kapadiya & Sons"
         className="look-img w-auto max-w-full rounded-lg"
         style={{ maxHeight: "76dvh" }}
       />
