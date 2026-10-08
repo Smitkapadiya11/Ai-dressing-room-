@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Kapadiya & Sons — a try-on mirror for Indian clothing shops";
+export const alt = "Kapadiya & Sons — AI fashion content, ads, films and website try-on";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -14,11 +14,11 @@ export default function OG() {
           Kapadiya &amp; Sons · Surat
         </div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 76, lineHeight: 1.05 }}>
-          <span>Every saree in the shop,</span>
-          <span style={{ color: "#E3CFA0", fontStyle: "italic" }}>on your customer.</span>
+          <span>Your next collection.</span>
+          <span style={{ color: "#E3CFA0", fontStyle: "italic" }}>A new point of view.</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", fontFamily: "sans-serif", fontSize: 24, color: "#A39B8E" }}>
-          <span>A try-on mirror for clothing shops and showrooms</span>
+          <span>AI fashion content · Ads · Films · Website try-on</span>
           <div style={{ width: 220, height: 2, background: "linear-gradient(90deg, transparent, #C9A961)" }} />
         </div>
       </div>

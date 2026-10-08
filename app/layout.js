@@ -9,11 +9,13 @@ import "@fontsource/manrope/500.css";
 import "@fontsource/manrope/600.css";
 import "@fontsource/manrope/700.css";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = {
-  title: "Kapadiya & Sons — Virtual Try On",
+  metadataBase: new URL(SITE_URL),
+  title: "Kapadiya & Sons — AI Creative Studio & Try-On",
   description:
-    "See it on you. An AI fitting mirror for Indian couture. Kapadiya & Sons, Surat.",
+    "AI fashion content, AI ads, short brand films and website try-on by Smit Kapadiya in Surat.",
 };
 
 export const viewport = {
